@@ -14,7 +14,9 @@ export default {
     groom: '신랑 측',
     bride: '신부 측',
   },
+  sideNavLabel: '청첩장 측 선택',
   parents: {
+    sectionTitle: '마음 전하실 곳',
     groom: '신랑 측 혼주',
     bride: '신부 측 혼주',
     father: '부',

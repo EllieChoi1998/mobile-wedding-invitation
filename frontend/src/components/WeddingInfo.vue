@@ -1,6 +1,9 @@
 <template>
-  <section class="wedding-info">
-    <h2 class="wedding-info__title">{{ t.weddingInfo.title }}</h2>
+  <section class="wedding-info section section--white">
+    <div class="section__head">
+      <div class="section__divider" />
+      <h2 class="section__title">{{ t.weddingInfo.title }}</h2>
+    </div>
     <dl class="wedding-info__list">
       <div class="wedding-info__item">
         <dt>{{ t.weddingInfo.date }}</dt>
@@ -64,15 +67,7 @@ const calendarCells = computed(() => {
 
 <style scoped>
 .wedding-info {
-  padding: 2.5rem 1.5rem;
   text-align: center;
-}
-
-.wedding-info__title {
-  margin: 0 0 1.5rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--color-primary-dark);
 }
 
 .wedding-info__list {

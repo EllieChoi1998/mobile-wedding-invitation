@@ -1,7 +1,10 @@
 <template>
-  <section class="rsvp">
-    <h2 class="rsvp__title">{{ t.rsvp.title }}</h2>
-    <p class="rsvp__desc">{{ t.rsvp.desc }}</p>
+  <section class="rsvp section section--accent">
+    <div class="section__head">
+      <div class="section__divider" />
+      <h2 class="section__title">{{ t.rsvp.title }}</h2>
+      <p class="section__desc">{{ t.rsvp.desc }}</p>
+    </div>
 
     <form class="rsvp__form" @submit.prevent="onSubmit">
       <div class="rsvp__field">
@@ -21,11 +24,11 @@
         <legend class="rsvp__label">{{ t.rsvp.sideLegend }}</legend>
         <div class="rsvp__options">
           <label class="rsvp__option">
-            <input v-model="side" type="radio" name="rsvp-side" value="groom" required />
+            <input v-model="rsvpSide" type="radio" name="rsvp-side" value="groom" required />
             <span>{{ t.side.groom }}</span>
           </label>
           <label class="rsvp__option">
-            <input v-model="side" type="radio" name="rsvp-side" value="bride" required />
+            <input v-model="rsvpSide" type="radio" name="rsvp-side" value="bride" required />
             <span>{{ t.side.bride }}</span>
           </label>
         </div>
@@ -56,18 +59,28 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { submitRsvp } from '../api/rsvp'
 import { useLocale } from '../composables/useLocale'
+import { useSide } from '../composables/useSide'
 
 const { t } = useLocale()
+const { side: pageSide } = useSide()
 
 const guestName = ref('')
-const side = ref('')
+const rsvpSide = ref('')
 const attending = ref('')
 const submitting = ref(false)
 const error = ref('')
 const success = ref(false)
+
+watch(
+  pageSide,
+  (newSide) => {
+    rsvpSide.value = newSide
+  },
+  { immediate: true },
+)
 
 async function onSubmit() {
   submitting.value = true
@@ -77,13 +90,13 @@ async function onSubmit() {
   try {
     await submitRsvp({
       guestName: guestName.value,
-      side: side.value,
+      side: rsvpSide.value,
       attending: attending.value === 'yes',
     })
     success.value = true
     guestName.value = ''
-    side.value = ''
     attending.value = ''
+    rsvpSide.value = pageSide.value
   } catch (err) {
     error.value = err.message || t.value.rsvp.error
   } finally {
@@ -93,25 +106,6 @@ async function onSubmit() {
 </script>
 
 <style scoped>
-.rsvp {
-  padding: 2.5rem 1.5rem;
-}
-
-.rsvp__title {
-  margin: 0 0 0.5rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  text-align: center;
-  color: var(--color-primary-dark);
-}
-
-.rsvp__desc {
-  margin: 0 0 1.75rem;
-  font-size: 0.8125rem;
-  text-align: center;
-  color: var(--color-text-muted);
-}
-
 .rsvp__form {
   display: flex;
   flex-direction: column;

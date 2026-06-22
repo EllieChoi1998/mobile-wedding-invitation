@@ -14,7 +14,9 @@ export default {
     groom: "Groom's Side",
     bride: "Bride's Side",
   },
+  sideNavLabel: 'Invitation side',
   parents: {
+    sectionTitle: 'Gift Accounts',
     groom: "Groom's Parents",
     bride: "Bride's Parents",
     father: 'Father',

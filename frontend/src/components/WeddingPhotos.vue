@@ -1,6 +1,9 @@
 <template>
-  <section class="wedding-photos">
-    <h2 class="wedding-photos__title">{{ t.weddingPhotos.title }}</h2>
+  <section class="wedding-photos section section--accent">
+    <div class="section__head">
+      <div class="section__divider" />
+      <h2 class="section__title">{{ t.weddingPhotos.title }}</h2>
+    </div>
 
     <div v-if="photos.length === 0" class="wedding-photos__empty">
       <div class="wedding-photos__placeholder">
@@ -104,19 +107,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.wedding-photos {
-  padding: 2.5rem 1.5rem;
-  background: var(--color-accent);
-}
-
-.wedding-photos__title {
-  margin: 0 0 1.25rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  text-align: center;
-  color: var(--color-primary-dark);
-}
-
 .wedding-photos__empty {
   display: flex;
   justify-content: center;
