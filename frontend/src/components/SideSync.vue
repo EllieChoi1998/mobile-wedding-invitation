@@ -6,34 +6,51 @@
 
     <nav class="hero__nav">
       <RouterLink
-        :to="{ path: '/', query: { side: 'groom' } }"
+        :to="{ path: '/', query: queryForSide('groom') }"
         class="hero__link"
         :class="{ 'hero__link--active': side === 'groom' }"
       >
-        신랑 측
+        {{ t.side.groom }}
       </RouterLink>
       <RouterLink
-        :to="{ path: '/', query: { side: 'bride' } }"
+        :to="{ path: '/', query: queryForSide('bride') }"
         class="hero__link"
         :class="{ 'hero__link--active': side === 'bride' }"
       >
-        신부 측
+        {{ t.side.bride }}
+      </RouterLink>
+    </nav>
+
+    <nav v-if="side === 'bride'" class="hero__lang" aria-label="Language">
+      <RouterLink
+        :to="{ path: '/', query: queryForLocale('ko') }"
+        class="hero__lang-link"
+        :class="{ 'hero__lang-link--active': !isEnglish }"
+      >
+        KO
+      </RouterLink>
+      <RouterLink
+        :to="{ path: '/', query: queryForLocale('en') }"
+        class="hero__lang-link"
+        :class="{ 'hero__lang-link--active': isEnglish }"
+      >
+        EN
       </RouterLink>
     </nav>
 
     <div class="hero__parents">
       <p class="hero__parents-label">{{ sideInfo.parentInfo.label }}</p>
       <p class="hero__parents-names">
-        (부)
+        ({{ t.parents.father }})
         <button type="button" class="hero__parent-btn" @click="openAccount(sideInfo.parentInfo.father)">
           {{ sideInfo.parentInfo.father.name }}
         </button>
-        · (모)
+        · ({{ t.parents.mother }})
         <button type="button" class="hero__parent-btn" @click="openAccount(sideInfo.parentInfo.mother)">
           {{ sideInfo.parentInfo.mother.name }}
         </button>
       </p>
-      <p class="hero__parents-hint">성함을 누르면 계좌번호를 확인할 수 있습니다</p>
+      <p class="hero__parents-hint">{{ t.parents.hint }}</p>
     </div>
 
     <AccountModal :open="modalOpen" :account="selectedAccount" @close="modalOpen = false" />
@@ -45,9 +62,12 @@ import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import AccountModal from './AccountModal.vue'
 import { useSide } from '../composables/useSide'
-import { couple, wedding } from '../data/invitation'
+import { useLocale } from '../composables/useLocale'
+import { useInvitationContent } from '../composables/useInvitationContent'
 
-const { side, sideInfo } = useSide()
+const { side } = useSide()
+const { t, isEnglish, queryForSide, queryForLocale } = useLocale()
+const { couple, wedding, sideInfo } = useInvitationContent()
 
 const modalOpen = ref(false)
 const selectedAccount = ref({ name: '', bank: '', accountNumber: '', holder: '' })
@@ -101,7 +121,32 @@ function openAccount(account) {
   display: flex;
   justify-content: center;
   gap: 0.625rem;
+  margin-bottom: 0.75rem;
+}
+
+.hero__lang {
+  display: flex;
+  justify-content: center;
+  gap: 0.375rem;
   margin-bottom: 1.75rem;
+}
+
+.hero__lang-link {
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  color: var(--color-text-muted);
+  border: 1px solid rgba(244, 167, 185, 0.35);
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.hero__lang-link--active {
+  color: var(--color-primary-dark);
+  border-color: var(--color-primary);
+  background: var(--color-accent);
 }
 
 .hero__link {

@@ -1,28 +1,33 @@
 <template>
   <Teleport to="body">
     <div v-if="open" class="account-modal" @click.self="emit('close')">
-      <div class="account-modal__panel" role="dialog" aria-modal="true" :aria-label="`${account.name} 계좌 정보`">
-        <button type="button" class="account-modal__close" aria-label="닫기" @click="emit('close')">
+      <div
+        class="account-modal__panel"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="`${account.name} ${t.accountModal.accountInfo}`"
+      >
+        <button type="button" class="account-modal__close" :aria-label="t.accountModal.close" @click="emit('close')">
           ✕
         </button>
-        <p class="account-modal__label">마음 전하실 곳</p>
+        <p class="account-modal__label">{{ t.accountModal.title }}</p>
         <h3 class="account-modal__name">{{ account.name }}</h3>
         <dl class="account-modal__info">
           <div class="account-modal__row">
-            <dt>은행</dt>
+            <dt>{{ t.accountModal.bank }}</dt>
             <dd>{{ account.bank }}</dd>
           </div>
           <div class="account-modal__row">
-            <dt>계좌번호</dt>
+            <dt>{{ t.accountModal.accountNumber }}</dt>
             <dd class="account-modal__account">{{ account.accountNumber }}</dd>
           </div>
           <div class="account-modal__row">
-            <dt>예금주</dt>
+            <dt>{{ t.accountModal.holder }}</dt>
             <dd>{{ account.holder }}</dd>
           </div>
         </dl>
         <button type="button" class="account-modal__copy" @click="copyAccount">
-          {{ copied ? '복사 완료!' : '계좌번호 복사' }}
+          {{ copied ? t.accountModal.copied : t.accountModal.copy }}
         </button>
       </div>
     </div>
@@ -31,6 +36,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useLocale } from '../composables/useLocale'
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -42,6 +48,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 
+const { t } = useLocale()
 const copied = ref(false)
 
 async function copyAccount() {

@@ -1,12 +1,12 @@
 <template>
   <section class="wedding-photos">
-    <h2 class="wedding-photos__title">웨딩 사진</h2>
+    <h2 class="wedding-photos__title">{{ t.weddingPhotos.title }}</h2>
 
     <div v-if="photos.length === 0" class="wedding-photos__empty">
       <div class="wedding-photos__placeholder">
         <span class="wedding-photos__placeholder-icon">♥</span>
-        <p>사진을 추가해 주세요</p>
-        <p class="wedding-photos__hint">
+        <p>{{ t.weddingPhotos.empty }}</p>
+        <p v-if="t.weddingPhotos.emptyHint" class="wedding-photos__hint">
           <code>frontend/src/assets/wedding-photos/</code> 폴더에<br />
           이미지를 넣으면 자동으로 표시됩니다.
         </p>
@@ -28,12 +28,14 @@
 
     <Teleport to="body">
       <div v-if="lightboxIndex !== null" class="lightbox" @click.self="closeLightbox">
-        <button type="button" class="lightbox__close" aria-label="닫기" @click="closeLightbox">✕</button>
+        <button type="button" class="lightbox__close" :aria-label="t.weddingPhotos.close" @click="closeLightbox">
+          ✕
+        </button>
         <button
           v-if="photos.length > 1"
           type="button"
           class="lightbox__nav lightbox__nav--prev"
-          aria-label="이전 사진"
+          :aria-label="t.weddingPhotos.prev"
           @click.stop="prevPhoto"
         >
           ‹
@@ -47,7 +49,7 @@
           v-if="photos.length > 1"
           type="button"
           class="lightbox__nav lightbox__nav--next"
-          aria-label="다음 사진"
+          :aria-label="t.weddingPhotos.next"
           @click.stop="nextPhoto"
         >
           ›
@@ -61,8 +63,10 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useWeddingPhotos } from '../composables/useWeddingPhotos'
+import { useLocale } from '../composables/useLocale'
 
 const { photos } = useWeddingPhotos()
+const { t } = useLocale()
 const lightboxIndex = ref(null)
 
 function openLightbox(index) {

@@ -6,8 +6,8 @@
     <RsvpForm />
 
     <section class="guest-gallery">
-      <h2 class="guest-gallery__title">하객 사진 갤러리</h2>
-      <p class="guest-gallery__hint">{{ sideInfo.label }} 사진을 업로드하고 함께 나눠보세요.</p>
+      <h2 class="guest-gallery__title">{{ t.guestGallery.title }}</h2>
+      <p class="guest-gallery__hint">{{ guestGalleryHint }}</p>
 
       <div class="guest-gallery__upload">
         <label class="guest-gallery__upload-label">
@@ -18,13 +18,13 @@
             :disabled="uploading"
             @change="onFileSelected"
           />
-          {{ uploading ? '업로드 중...' : '사진 선택하기' }}
+          {{ uploading ? t.guestGallery.uploading : t.guestGallery.select }}
         </label>
         <p v-if="uploadError" class="guest-gallery__error">{{ uploadError }}</p>
-        <p v-if="uploadSuccess" class="guest-gallery__success">사진이 업로드되었습니다!</p>
+        <p v-if="uploadSuccess" class="guest-gallery__success">{{ t.guestGallery.uploadSuccess }}</p>
       </div>
 
-      <div v-if="loading" class="guest-gallery__loading">사진을 불러오는 중...</div>
+      <div v-if="loading" class="guest-gallery__loading">{{ t.guestGallery.loading }}</div>
       <div v-else-if="loadError" class="guest-gallery__error">{{ loadError }}</div>
       <ul v-else class="guest-gallery__grid">
         <li v-for="photo in photos" :key="photo.photoId" class="guest-gallery__item">
@@ -32,22 +32,28 @@
         </li>
       </ul>
       <p v-if="!loading && !loadError && photos.length === 0" class="guest-gallery__empty">
-        아직 업로드된 사진이 없습니다.
+        {{ t.guestGallery.empty }}
       </p>
     </section>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import SideSync from '../components/SideSync.vue'
 import WeddingInfo from '../components/WeddingInfo.vue'
 import WeddingPhotos from '../components/WeddingPhotos.vue'
 import RsvpForm from '../components/RsvpForm.vue'
 import { useSide } from '../composables/useSide'
+import { useInvitationContent } from '../composables/useInvitationContent'
 import { listPhotos, requestPresignedUrl, uploadToS3 } from '../api/photos'
 
-const { side, sideInfo } = useSide()
+const { side } = useSide()
+const { sideInfo, t } = useInvitationContent()
+
+const guestGalleryHint = computed(() =>
+  t.value.guestGallery.hint.replace('{side}', sideInfo.value.label),
+)
 
 const photos = ref([])
 const loading = ref(false)
@@ -63,7 +69,7 @@ async function fetchPhotos() {
     const data = await listPhotos(side.value)
     photos.value = data.photos ?? []
   } catch (err) {
-    loadError.value = err.message || '사진을 불러오지 못했습니다.'
+    loadError.value = err.message || t.value.guestGallery.loadError
     photos.value = []
   } finally {
     loading.value = false
@@ -89,7 +95,7 @@ async function onFileSelected(event) {
     uploadSuccess.value = true
     await fetchPhotos()
   } catch (err) {
-    uploadError.value = err.message || '업로드에 실패했습니다.'
+    uploadError.value = err.message || t.value.guestGallery.uploadError
   } finally {
     uploading.value = false
   }

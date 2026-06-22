@@ -1,16 +1,16 @@
 <template>
   <section class="wedding-info">
-    <h2 class="wedding-info__title">예식 안내</h2>
+    <h2 class="wedding-info__title">{{ t.weddingInfo.title }}</h2>
     <dl class="wedding-info__list">
       <div class="wedding-info__item">
-        <dt>일시</dt>
+        <dt>{{ t.weddingInfo.date }}</dt>
         <dd>
           {{ wedding.date }} ({{ wedding.dayNote }})<br />
           {{ wedding.time }}
         </dd>
 
         <div class="wedding-calendar">
-          <p class="wedding-calendar__month">{{ wedding.calendar.year }}년 {{ wedding.calendar.month }}월</p>
+          <p class="wedding-calendar__month">{{ calendarLabel }}</p>
           <div class="wedding-calendar__weekdays">
             <span v-for="label in weekdays" :key="label" class="wedding-calendar__weekday">{{ label }}</span>
           </div>
@@ -37,7 +37,7 @@
         </div>
       </div>
       <div class="wedding-info__item">
-        <dt>장소</dt>
+        <dt>{{ t.weddingInfo.venue }}</dt>
         <dd>{{ wedding.venue }}</dd>
       </div>
     </dl>
@@ -46,12 +46,12 @@
 
 <script setup>
 import { computed } from 'vue'
-import { wedding } from '../data/invitation'
+import { useInvitationContent } from '../composables/useInvitationContent'
 
-const weekdays = ['일', '월', '화', '수', '목', '금', '토']
+const { wedding, calendarLabel, weekdays, t } = useInvitationContent()
 
 const calendarCells = computed(() => {
-  const { year, month } = wedding.calendar
+  const { year, month } = wedding.value.calendar
   const firstWeekday = new Date(year, month - 1, 1).getDay()
   const daysInMonth = new Date(year, month, 0).getDate()
 

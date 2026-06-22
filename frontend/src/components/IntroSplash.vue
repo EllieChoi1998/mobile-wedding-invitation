@@ -27,7 +27,7 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
-import { couple, wedding } from '../data/invitation'
+import { useInvitationContent } from '../composables/useInvitationContent'
 
 const splashModules = import.meta.glob('../assets/splash/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}', {
   eager: true,
@@ -35,6 +35,8 @@ const splashModules = import.meta.glob('../assets/splash/*.{jpg,jpeg,png,webp,JP
 })
 
 const splashImage = Object.values(splashModules)[0] ?? null
+
+const { couple, wedding } = useInvitationContent()
 
 const emit = defineEmits(['complete'])
 
