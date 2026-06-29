@@ -1,13 +1,13 @@
 <template>
   <section class="guest-gallery section section--white">
-    <div class="section__head">
-      <div class="section__divider" />
-      <h2 class="section__title">{{ t.guestGallery.title }}</h2>
-      <p class="section__desc">{{ guestGalleryHint }}</p>
-    </div>
+    <SectionHeader
+      :eyebrow="t.guestGallery.eyebrow"
+      :title="t.guestGallery.title"
+      :desc="t.guestGallery.desc"
+    />
 
     <div class="guest-gallery__upload">
-      <label class="guest-gallery__upload-label">
+      <label class="guest-gallery__upload-label btn-outline">
         <input
           type="file"
           accept="image/*"
@@ -21,6 +21,7 @@
       <p v-if="uploadSuccess" class="guest-gallery__message guest-gallery__message--success">
         {{ t.guestGallery.uploadSuccess }}
       </p>
+      <p class="guest-gallery__note">{{ t.guestGallery.uploadNote }}</p>
     </div>
 
     <div v-if="loading" class="guest-gallery__status">{{ t.guestGallery.loading }}</div>
@@ -37,17 +38,14 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useSide } from '../composables/useSide'
-import { useInvitationContent } from '../composables/useInvitationContent'
+import { useLocale } from '../composables/useLocale'
 import { listPhotos, requestPresignedUrl, uploadToS3 } from '../api/photos'
+import SectionHeader from './SectionHeader.vue'
 
 const { side } = useSide()
-const { sideInfo, t } = useInvitationContent()
-
-const guestGalleryHint = computed(() =>
-  t.value.guestGallery.hint.replace('{side}', sideInfo.value.label),
-)
+const { t } = useLocale()
 
 const photos = ref([])
 const loading = ref(false)
@@ -106,20 +104,14 @@ watch(side, fetchPhotos, { immediate: true })
 
 .guest-gallery__upload-label {
   display: inline-block;
-  padding: 0.75rem 1.5rem;
-  border-radius: 10px;
-  background: #fff;
-  color: var(--color-primary-dark);
-  font-size: 0.875rem;
-  font-weight: 500;
-  border: 1.5px solid rgba(244, 167, 185, 0.45);
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
 }
 
-.guest-gallery__upload-label:hover {
-  background: var(--color-accent);
-  border-color: var(--color-primary);
+.guest-gallery__note {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-align: center;
 }
 
 .guest-gallery__file-input {

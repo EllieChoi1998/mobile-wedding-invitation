@@ -1,23 +1,50 @@
 <template>
   <div class="invitation">
     <SideToolbar />
-    <InvitationHero />
-    <WeddingInfo />
-    <WeddingPhotos />
-    <ParentsSection />
+    <CoverHero />
+    <AboutUs />
+    <OurTimeline />
+    <InterviewSection />
+    <WeddingDay />
+    <LocationSection />
+    <SectionPhoto
+      :image-path="assets.midPhoto"
+      alt="middle section photo"
+      :placeholder-label="t.sectionPhoto.midHint"
+    />
+    <DPlusDay />
+    <GallerySection />
+    <InformationSection />
+    <GuestbookSection />
+    <AccountSection />
     <RsvpForm />
+    <FlowerLink />
     <GuestGallery />
+    <EndingSection />
   </div>
 </template>
 
 <script setup>
 import SideToolbar from '../components/SideToolbar.vue'
-import InvitationHero from '../components/InvitationHero.vue'
-import WeddingInfo from '../components/WeddingInfo.vue'
-import WeddingPhotos from '../components/WeddingPhotos.vue'
-import ParentsSection from '../components/ParentsSection.vue'
+import CoverHero from '../components/CoverHero.vue'
+import AboutUs from '../components/AboutUs.vue'
+import OurTimeline from '../components/OurTimeline.vue'
+import InterviewSection from '../components/InterviewSection.vue'
+import WeddingDay from '../components/WeddingDay.vue'
+import LocationSection from '../components/LocationSection.vue'
+import SectionPhoto from '../components/SectionPhoto.vue'
+import DPlusDay from '../components/DPlusDay.vue'
+import GallerySection from '../components/GallerySection.vue'
+import InformationSection from '../components/InformationSection.vue'
+import GuestbookSection from '../components/GuestbookSection.vue'
+import AccountSection from '../components/AccountSection.vue'
 import RsvpForm from '../components/RsvpForm.vue'
+import FlowerLink from '../components/FlowerLink.vue'
 import GuestGallery from '../components/GuestGallery.vue'
+import EndingSection from '../components/EndingSection.vue'
+import { useInvitationContent } from '../composables/useInvitationContent'
+
+const { assets, t } = useInvitationContent()
 </script>
 
 <style scoped>

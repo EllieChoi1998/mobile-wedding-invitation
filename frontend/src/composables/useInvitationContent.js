@@ -1,5 +1,21 @@
 import { computed } from 'vue'
-import { couple, parents, wedding as weddingMeta, getInvitationBySide } from '../data/invitation'
+import {
+  couple,
+  parents,
+  parentsLine,
+  contacts,
+  timeline,
+  interview,
+  relationship,
+  information,
+  accounts,
+  assets,
+  cover,
+  wedding as weddingMeta,
+  flowerDeliveryUrl,
+  share,
+  getInvitationBySide,
+} from '../data/invitation'
 import { useSide } from './useSide'
 import { useLocale } from './useLocale'
 
@@ -8,13 +24,21 @@ export function useInvitationContent() {
   const { locale, t } = useLocale()
 
   const wedding = computed(() => ({
-    ...weddingMeta.calendar,
+    ...weddingMeta,
     date: t.value.wedding.date,
     dayNote: t.value.wedding.dayNote,
     time: t.value.wedding.time,
     venue: t.value.wedding.venue,
+    hall: weddingMeta.hall,
+    address: weddingMeta.address,
     greeting: t.value.wedding.greeting,
     calendar: weddingMeta.calendar,
+    dateISO: weddingMeta.dateISO,
+    lat: weddingMeta.lat,
+    lng: weddingMeta.lng,
+    mapLinks: weddingMeta.mapLinks,
+    mapImagePath: weddingMeta.mapImagePath,
+    transport: weddingMeta.transport,
     calendarYearSuffix: t.value.wedding.calendarYearSuffix,
     calendarMonthSuffix: t.value.wedding.calendarMonthSuffix,
   }))
@@ -43,10 +67,22 @@ export function useInvitationContent() {
   return {
     couple,
     parents,
+    parentsLine,
+    contacts,
+    timeline,
+    interview,
+    relationship,
+    information,
+    accounts,
+    assets,
+    cover,
+    flowerDeliveryUrl,
+    share,
     wedding,
     sideInfo,
     calendarLabel,
     weekdays: computed(() => t.value.weekdays),
     t,
+    side,
   }
 }

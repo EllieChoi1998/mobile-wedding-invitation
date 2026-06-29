@@ -1,62 +1,55 @@
 <template>
-  <section class="wedding-photos section section--accent">
-    <div class="section__head">
-      <div class="section__divider" />
-      <h2 class="section__title">{{ t.weddingPhotos.title }}</h2>
-    </div>
+  <section class="gallery section section--accent">
+    <SectionHeader :eyebrow="t.gallery.eyebrow" :title="t.gallery.title" />
 
-    <div v-if="photos.length === 0" class="wedding-photos__empty">
-      <div class="wedding-photos__placeholder">
-        <span class="wedding-photos__placeholder-icon">♥</span>
-        <p>{{ t.weddingPhotos.empty }}</p>
-        <p v-if="t.weddingPhotos.emptyHint" class="wedding-photos__hint">
-          <code>frontend/src/assets/wedding-photos/</code> 폴더에<br />
-          이미지를 넣으면 자동으로 표시됩니다.
-        </p>
+    <div v-if="photos.length === 0" class="gallery__empty">
+      <div class="image-placeholder">
+        <span class="image-placeholder__icon">♥</span>
+        <p class="image-placeholder__label">{{ t.gallery.empty }}</p>
+        <p class="image-placeholder__label">{{ t.gallery.emptyHint }}</p>
       </div>
     </div>
 
-    <div v-else class="wedding-photos__grid">
+    <div v-else class="gallery__grid">
       <button
-        v-for="(photo, index) in photos"
+        v-for="(photo, index) in visiblePhotos"
         :key="photo.name"
         type="button"
-        class="wedding-photos__item"
-        :class="{ 'wedding-photos__item--featured': index === 0 }"
-        @click="openLightbox(index)"
+        class="gallery__item"
+        :class="{ 'gallery__item--featured': index === 0 && !showAll }"
+        @click="openLightbox(photo)"
       >
-        <img :src="photo.url" :alt="photo.name" class="wedding-photos__image" loading="lazy" />
+        <img :src="photo.url" :alt="photo.name" class="gallery__image" loading="lazy" />
       </button>
     </div>
 
+    <button
+      v-if="photos.length > initialCount"
+      type="button"
+      class="btn-text gallery__more"
+      @click="showAll = !showAll"
+    >
+      {{ showAll ? t.interview.showLess : t.gallery.showMore }}
+    </button>
+
     <Teleport to="body">
       <div v-if="lightboxIndex !== null" class="lightbox" @click.self="closeLightbox">
-        <button type="button" class="lightbox__close" :aria-label="t.weddingPhotos.close" @click="closeLightbox">
-          ✕
-        </button>
+        <button type="button" class="lightbox__close" :aria-label="t.gallery.close" @click="closeLightbox">✕</button>
         <button
           v-if="photos.length > 1"
           type="button"
           class="lightbox__nav lightbox__nav--prev"
-          :aria-label="t.weddingPhotos.prev"
+          :aria-label="t.gallery.prev"
           @click.stop="prevPhoto"
-        >
-          ‹
-        </button>
-        <img
-          :src="photos[lightboxIndex].url"
-          :alt="photos[lightboxIndex].name"
-          class="lightbox__image"
-        />
+        >‹</button>
+        <img :src="photos[lightboxIndex].url" :alt="photos[lightboxIndex].name" class="lightbox__image" />
         <button
           v-if="photos.length > 1"
           type="button"
           class="lightbox__nav lightbox__nav--next"
-          :aria-label="t.weddingPhotos.next"
+          :aria-label="t.gallery.next"
           @click.stop="nextPhoto"
-        >
-          ›
-        </button>
+        >›</button>
         <p class="lightbox__counter">{{ lightboxIndex + 1 }} / {{ photos.length }}</p>
       </div>
     </Teleport>
@@ -64,16 +57,25 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useWeddingPhotos } from '../composables/useWeddingPhotos'
-import { useLocale } from '../composables/useLocale'
+import { useInvitationContent } from '../composables/useInvitationContent'
+import SectionHeader from './SectionHeader.vue'
 
 const { photos } = useWeddingPhotos()
-const { t } = useLocale()
+const { t } = useInvitationContent()
+
+const initialCount = 6
+const showAll = ref(false)
 const lightboxIndex = ref(null)
 
-function openLightbox(index) {
-  lightboxIndex.value = index
+const visiblePhotos = computed(() =>
+  showAll.value ? photos.value : photos.value.slice(0, initialCount),
+)
+
+function openLightbox(photo) {
+  const index = photos.value.findIndex((p) => p.name === photo.name)
+  lightboxIndex.value = index >= 0 ? index : 0
   document.body.style.overflow = 'hidden'
 }
 
@@ -107,55 +109,18 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.wedding-photos__empty {
-  display: flex;
-  justify-content: center;
+.gallery__empty {
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.wedding-photos__placeholder {
-  width: 100%;
-  max-width: 320px;
-  padding: 2.5rem 1.5rem;
-  text-align: center;
-  border-radius: 16px;
-  background: #fff;
-  border: 2px dashed rgba(244, 167, 185, 0.5);
-}
-
-.wedding-photos__placeholder-icon {
-  display: block;
-  margin-bottom: 0.75rem;
-  font-size: 2rem;
-  color: var(--color-primary);
-}
-
-.wedding-photos__placeholder p {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-}
-
-.wedding-photos__hint {
-  margin-top: 0.75rem !important;
-  font-size: 0.75rem !important;
-  line-height: 1.6;
-}
-
-.wedding-photos__hint code {
-  font-size: 0.7rem;
-  padding: 0.125rem 0.375rem;
-  border-radius: 4px;
-  background: var(--color-accent);
-  color: var(--color-primary-dark);
-}
-
-.wedding-photos__grid {
+.gallery__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
 }
 
-.wedding-photos__item {
+.gallery__item {
   margin: 0;
   padding: 0;
   border: none;
@@ -168,20 +133,25 @@ onUnmounted(() => {
   transition: transform 0.2s;
 }
 
-.wedding-photos__item:active {
+.gallery__item:active {
   transform: scale(0.98);
 }
 
-.wedding-photos__item--featured {
+.gallery__item--featured {
   grid-column: span 2;
   aspect-ratio: 4 / 3;
 }
 
-.wedding-photos__image {
+.gallery__image {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.gallery__more {
+  display: block;
+  margin: 1.5rem auto 0;
 }
 
 .lightbox {
@@ -231,13 +201,8 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.lightbox__nav--prev {
-  left: 0.75rem;
-}
-
-.lightbox__nav--next {
-  right: 0.75rem;
-}
+.lightbox__nav--prev { left: 0.75rem; }
+.lightbox__nav--next { right: 0.75rem; }
 
 .lightbox__counter {
   position: absolute;

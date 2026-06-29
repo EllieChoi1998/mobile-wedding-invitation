@@ -1,0 +1,13 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "mobile-wedding-invitation"
+resolve_s3 = true
+s3_prefix = "mobile-wedding-invitation"
+region = "ap-northeast-2"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+
+# Copy to samconfig.toml and set your deployment bucket:
+# s3_bucket = "your-sam-deployment-bucket"

@@ -1,10 +1,10 @@
 <template>
   <section class="rsvp section section--accent">
-    <div class="section__head">
-      <div class="section__divider" />
-      <h2 class="section__title">{{ t.rsvp.title }}</h2>
-      <p class="section__desc">{{ t.rsvp.desc }}</p>
-    </div>
+    <SectionHeader
+      :eyebrow="t.rsvp.eyebrow"
+      :title="t.rsvp.title"
+      :desc="t.rsvp.desc"
+    />
 
     <form class="rsvp__form" @submit.prevent="onSubmit">
       <div class="rsvp__field">
@@ -48,7 +48,7 @@
         </div>
       </fieldset>
 
-      <button type="submit" class="rsvp__submit" :disabled="submitting">
+      <button type="submit" class="btn-primary rsvp__submit" :disabled="submitting">
         {{ submitting ? t.rsvp.submitting : t.rsvp.submit }}
       </button>
 
@@ -63,6 +63,7 @@ import { ref, watch } from 'vue'
 import { submitRsvp } from '../api/rsvp'
 import { useLocale } from '../composables/useLocale'
 import { useSide } from '../composables/useSide'
+import SectionHeader from './SectionHeader.vue'
 
 const { t } = useLocale()
 const { side: pageSide } = useSide()
@@ -173,25 +174,8 @@ async function onSubmit() {
 }
 
 .rsvp__submit {
+  width: 100%;
   margin-top: 0.5rem;
-  padding: 0.875rem;
-  border: none;
-  border-radius: 10px;
-  background: var(--color-primary);
-  color: #fff;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.rsvp__submit:hover:not(:disabled) {
-  background: var(--color-primary-dark);
-}
-
-.rsvp__submit:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .rsvp__message {

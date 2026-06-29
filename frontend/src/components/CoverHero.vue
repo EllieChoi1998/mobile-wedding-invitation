@@ -1,0 +1,78 @@
+<template>
+  <header class="cover-hero section section--hero">
+    <div class="cover-hero__image">
+      <ImageWithPlaceholder
+        :src="coverImage"
+        :alt="`${couple.groom.fullName} & ${couple.bride.fullName}`"
+        :placeholder-label="`${coverData.imagePath} — 커버/히어로 사진`"
+      />
+    </div>
+
+    <div class="cover-hero__content">
+      <p class="cover-hero__eyebrow">{{ t.cover.eyebrow }}</p>
+      <h1 class="cover-hero__title">{{ t.cover.title }}</h1>
+      <p class="cover-hero__greeting">{{ wedding.greeting }}</p>
+      <ParentsLine @contact="contactOpen = true" />
+    </div>
+
+    <ContactModal :open="contactOpen" @close="contactOpen = false" />
+  </header>
+</template>
+
+<script setup>
+import { computed, ref } from 'vue'
+import { resolveAssetImage } from '../composables/useAssetImage'
+import { useInvitationContent } from '../composables/useInvitationContent'
+import ImageWithPlaceholder from './ImageWithPlaceholder.vue'
+import ParentsLine from './ParentsLine.vue'
+import ContactModal from './ContactModal.vue'
+import { cover as coverData } from '../data/invitation'
+
+const { couple, wedding, t } = useInvitationContent()
+const contactOpen = ref(false)
+
+const coverImage = computed(() => resolveAssetImage(coverData.imagePath))
+</script>
+
+<style scoped>
+.cover-hero {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.cover-hero__image {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: 420px;
+}
+
+.cover-hero__content {
+  padding: 2rem var(--section-pad-x) 0;
+  text-align: center;
+}
+
+.cover-hero__eyebrow {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-primary-dark);
+}
+
+.cover-hero__title {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-serif);
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.cover-hero__greeting {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 2;
+  white-space: pre-line;
+  color: var(--color-text-muted);
+}
+</style>
