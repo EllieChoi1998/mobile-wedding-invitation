@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import InvitationView from '../views/InvitationView.vue'
+import AdminView from '../views/AdminView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -8,6 +9,11 @@ const router = createRouter({
       path: '/',
       name: 'invitation',
       component: InvitationView,
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: AdminView,
     },
   ],
 })

@@ -13,12 +13,18 @@ Globals:
       Variables:
         TABLE_NAME: !Ref PhotosTable
         BUCKET_NAME: !Ref PhotosBucket
+        ADMIN_PASSWORD: !Ref AdminPassword
 
 Parameters:
   FrontendOrigin:
     Type: String
     Default: http://localhost:5173
     Description: Frontend origin for CORS (set to your Vercel URL after deploy)
+  AdminPassword:
+    Type: String
+    NoEcho: true
+    Default: ''
+    Description: Password for admin dashboard access (set via GitHub Secret ADMIN_PASSWORD)
 
 Resources:
   PhotosTable:
@@ -74,6 +80,7 @@ Resources:
         AllowHeaders:
           - Content-Type
           - Authorization
+          - X-Admin-Password
         AllowOrigins:
           - !Ref FrontendOrigin
           - http://localhost:5173
@@ -177,6 +184,32 @@ Resources:
             ApiId: !Ref HttpApi
             Path: /guestbook
             Method: POST
+
+  AdminGetDataFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/adminGetData.js
+    Properties:
+      CodeUri: .
+      Handler: adminGetData.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref PhotosTable
+        - S3ReadPolicy:
+            BucketName: !Ref PhotosBucket
+      Events:
+        AdminGetDataApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /admin/data
+            Method: GET
 
   ListGuestbookFunction:
     Type: AWS::Serverless::Function

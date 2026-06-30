@@ -1,12 +1,13 @@
 <template>
   <RouterView />
-  <IntroSplash v-if="showSplash" @complete="showSplash = false" />
+  <IntroSplash v-if="showSplash && route.name !== 'admin'" @complete="showSplash = false" />
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import IntroSplash from './components/IntroSplash.vue'
 
+const route = useRoute()
 const showSplash = ref(true)
 </script>
