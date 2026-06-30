@@ -79,8 +79,8 @@ export const parents = {
     label: '신부 측 혼주',
     father: {
       name: '최 태경',
-      bank: '우리은행',
-      accountNumber: '1002-123-456789',
+      bank: '신한은행',
+      accountNumber: '110-527-261285',
       holder: '최 태경',
     },
     mother: {
