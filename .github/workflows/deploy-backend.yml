@@ -75,4 +75,4 @@ jobs:
             --capabilities CAPABILITY_IAM \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset \
-            --parameter-overrides "AdminPassword=${{ secrets.ADMIN_PASSWORD }} FrontendOrigin=${FRONTEND_ORIGIN}"
+            --parameter-overrides "AdminPassword=${{ secrets.ADMIN_PASSWORD }} DeletePassword=${{ secrets.DELETE_PASSWORD }} FrontendOrigin=${FRONTEND_ORIGIN}"

@@ -183,11 +183,6 @@ export const wedding = {
   },
 }
 
-/** 게스트 사진 업로드 기간 — 하객 공유 전 테스트 후 allowBeforeWeddingDay를 false로 */
-export const guestPhotoUpload = {
-  allowBeforeWeddingDay: true,
-}
-
 export const relationship = {
   startDateISO: '2014-02-16T00:00:00+09:00',
 }

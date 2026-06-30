@@ -17,3 +17,14 @@ export function verifyAdminPassword(event) {
 
   return null
 }
+
+export function verifyDeletePassword(provided) {
+  const configured = process.env.DELETE_PASSWORD
+  if (!configured) {
+    return jsonResponse(503, { message: 'Delete access is not configured' })
+  }
+  if (!provided || provided !== configured) {
+    return jsonResponse(403, { message: 'Invalid delete password' })
+  }
+  return null
+}

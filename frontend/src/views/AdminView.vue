@@ -1,8 +1,29 @@
 <template>
-  <div class="admin">
+  <div class="admin" :class="{ 'admin--delete-mode': deleteMode }">
     <header class="admin__header">
       <h1 class="admin__title">관리자 대시보드</h1>
-      <button v-if="authenticated" type="button" class="admin__logout" @click="logout">
+      <div v-if="authenticated && data" class="admin__header-actions">
+        <button
+          v-if="!deleteMode"
+          type="button"
+          class="admin__mode-btn"
+          @click="enterDeleteMode"
+        >
+          데이터 삭제
+        </button>
+        <button
+          v-else
+          type="button"
+          class="admin__mode-btn admin__mode-btn--cancel"
+          @click="exitDeleteMode"
+        >
+          삭제 취소
+        </button>
+        <button type="button" class="admin__logout" @click="logout">
+          로그아웃
+        </button>
+      </div>
+      <button v-else-if="authenticated" type="button" class="admin__logout" @click="logout">
         로그아웃
       </button>
     </header>
@@ -32,6 +53,10 @@
     <p v-else-if="loadError" class="admin__error">{{ loadError }}</p>
 
     <template v-else-if="data">
+      <p v-if="deleteMode" class="admin__delete-hint">
+        삭제할 항목을 선택한 뒤, 하단에서 삭제 비밀번호를 입력하세요.
+      </p>
+
       <section class="admin__summary">
         <div class="admin__card">
           <h2 class="admin__card-title">RSVP</h2>
@@ -54,6 +79,30 @@
         </div>
       </section>
 
+      <section class="admin__section admin__settings">
+        <h2 class="admin__section-title">설정</h2>
+        <div class="admin__settings-card">
+          <div class="admin__settings-row">
+            <div>
+              <p class="admin__settings-label">게스트 사진 업로드</p>
+              <p class="admin__settings-desc">
+                {{ data.settings.photoUploadOpen ? '하객이 사진을 업로드할 수 있습니다.' : '업로드가 차단되어 있습니다.' }}
+              </p>
+            </div>
+            <button
+              type="button"
+              class="admin__toggle"
+              :class="{ 'admin__toggle--on': data.settings.photoUploadOpen }"
+              :disabled="settingsUpdating"
+              @click="togglePhotoUpload"
+            >
+              {{ settingsUpdating ? '…' : data.settings.photoUploadOpen ? '허용 중' : '차단 중' }}
+            </button>
+          </div>
+          <p v-if="settingsError" class="admin__error">{{ settingsError }}</p>
+        </div>
+      </section>
+
       <section class="admin__section">
         <h2 class="admin__section-title">RSVP 목록</h2>
         <div v-if="data.rsvps.length === 0" class="admin__empty">등록된 RSVP가 없습니다</div>
@@ -61,15 +110,27 @@
           <table class="admin__table">
             <thead>
               <tr>
+                <th v-if="deleteMode" class="admin__check-col"></th>
                 <th>이름</th>
                 <th>측</th>
                 <th>참석</th>
                 <th>제출 시각</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="rsvp in data.rsvps" :key="rsvp.rsvpId">
+              <tr
+                v-for="rsvp in data.rsvps"
+                :key="rsvp.rsvpId"
+                :class="{ 'admin__row--selected': isSelected('rsvp', rsvp.rsvpId, rsvp.side) }"
+                @click="deleteMode && toggleSelect({ resource: 'rsvp', id: rsvp.rsvpId, side: rsvp.side })"
+              >
+                <td v-if="deleteMode" class="admin__check-col" @click.stop>
+                  <input
+                    type="checkbox"
+                    :checked="isSelected('rsvp', rsvp.rsvpId, rsvp.side)"
+                    @change="toggleSelect({ resource: 'rsvp', id: rsvp.rsvpId, side: rsvp.side })"
+                  />
+                </td>
                 <td>{{ rsvp.guestName }}</td>
                 <td>{{ sideLabel(rsvp.side) }}</td>
                 <td>
@@ -81,16 +142,6 @@
                   </span>
                 </td>
                 <td>{{ formatDate(rsvp.createdAt) }}</td>
-                <td class="admin__actions">
-                  <button
-                    type="button"
-                    class="admin__delete"
-                    :disabled="isDeleting('rsvp', rsvp.rsvpId)"
-                    @click="confirmDelete('rsvp', rsvp.rsvpId, rsvp.side, rsvp.guestName)"
-                  >
-                    {{ isDeleting('rsvp', rsvp.rsvpId) ? '…' : '삭제' }}
-                  </button>
-                </td>
               </tr>
             </tbody>
           </table>
@@ -104,29 +155,31 @@
           <table class="admin__table">
             <thead>
               <tr>
+                <th v-if="deleteMode" class="admin__check-col"></th>
                 <th>작성자</th>
                 <th>메시지</th>
                 <th>측</th>
                 <th>작성 시각</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="msg in data.guestbook" :key="msg.messageId">
+              <tr
+                v-for="msg in data.guestbook"
+                :key="msg.messageId"
+                :class="{ 'admin__row--selected': isSelected('guestbook', msg.messageId) }"
+                @click="deleteMode && toggleSelect({ resource: 'guestbook', id: msg.messageId })"
+              >
+                <td v-if="deleteMode" class="admin__check-col" @click.stop>
+                  <input
+                    type="checkbox"
+                    :checked="isSelected('guestbook', msg.messageId)"
+                    @change="toggleSelect({ resource: 'guestbook', id: msg.messageId })"
+                  />
+                </td>
                 <td>{{ msg.authorName }}</td>
                 <td class="admin__message">{{ msg.message }}</td>
                 <td>{{ msg.side ? sideLabel(msg.side) : '-' }}</td>
                 <td>{{ formatDate(msg.createdAt) }}</td>
-                <td class="admin__actions">
-                  <button
-                    type="button"
-                    class="admin__delete"
-                    :disabled="isDeleting('guestbook', msg.messageId)"
-                    @click="confirmDelete('guestbook', msg.messageId, null, msg.authorName)"
-                  >
-                    {{ isDeleting('guestbook', msg.messageId) ? '…' : '삭제' }}
-                  </button>
-                </td>
               </tr>
             </tbody>
           </table>
@@ -155,7 +208,20 @@
         </div>
         <div v-if="currentPhotos.length === 0" class="admin__empty">업로드된 사진이 없습니다</div>
         <ul v-else class="admin__photo-grid">
-          <li v-for="photo in currentPhotos" :key="photo.photoId" class="admin__photo-item">
+          <li
+            v-for="photo in currentPhotos"
+            :key="photo.photoId"
+            class="admin__photo-item"
+            :class="{ 'admin__photo-item--selected': isSelected('photo', photo.photoId, photoTab) }"
+            @click="deleteMode && toggleSelect({ resource: 'photo', id: photo.photoId, side: photoTab })"
+          >
+            <label v-if="deleteMode" class="admin__photo-check" @click.stop>
+              <input
+                type="checkbox"
+                :checked="isSelected('photo', photo.photoId, photoTab)"
+                @change="toggleSelect({ resource: 'photo', id: photo.photoId, side: photoTab })"
+              />
+            </label>
             <img
               :src="photo.viewUrl"
               :alt="photo.fileName"
@@ -166,33 +232,66 @@
               <p class="admin__photo-name">{{ photo.fileName }}</p>
               <p class="admin__photo-date">{{ formatDate(photo.uploadedAt) }}</p>
               <a
+                v-if="!deleteMode"
                 :href="photo.downloadUrl"
                 :download="photo.fileName"
                 target="_blank"
                 rel="noopener"
                 class="admin__download"
+                @click.stop
               >
                 원본 다운로드
               </a>
-              <button
-                type="button"
-                class="admin__delete admin__delete--photo"
-                :disabled="isDeleting('photo', photo.photoId)"
-                @click="confirmDelete('photo', photo.photoId, photoTab, photo.fileName)"
-              >
-                {{ isDeleting('photo', photo.photoId) ? '삭제 중…' : '삭제' }}
-              </button>
             </div>
           </li>
         </ul>
       </section>
     </template>
+
+    <div v-if="deleteMode && data" class="admin__delete-bar">
+      <span class="admin__delete-count">{{ selectedCount }}개 선택됨</span>
+      <button
+        type="button"
+        class="admin__delete-submit"
+        :disabled="selectedCount === 0 || deleting"
+        @click="openDeleteModal"
+      >
+        선택 삭제
+      </button>
+    </div>
+
+    <div v-if="showDeleteModal" class="admin__modal-backdrop" @click.self="closeDeleteModal">
+      <form class="admin__modal" @submit.prevent="submitDelete">
+        <h3 class="admin__modal-title">삭제 확인</h3>
+        <p class="admin__modal-desc">
+          선택한 <strong>{{ selectedCount }}개</strong> 항목을 삭제합니다.<br />
+          되돌릴 수 없습니다. 삭제 비밀번호를 입력하세요.
+        </p>
+        <input
+          v-model="deletePasswordInput"
+          type="password"
+          class="admin__input"
+          placeholder="삭제 비밀번호"
+          autocomplete="off"
+          autofocus
+        />
+        <p v-if="deleteModalError" class="admin__error">{{ deleteModalError }}</p>
+        <div class="admin__modal-actions">
+          <button type="button" class="admin__modal-cancel" @click="closeDeleteModal">
+            취소
+          </button>
+          <button type="submit" class="admin__modal-confirm" :disabled="deleting || !deletePasswordInput">
+            {{ deleting ? '삭제 중…' : '삭제' }}
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { fetchAdminData, deleteAdminItem } from '../api/admin'
+import { deleteAdminItems, fetchAdminData, updatePhotoUploadSetting } from '../api/admin'
 import { isApiConfigured } from '../api/client'
 
 const apiConfigured = isApiConfigured()
@@ -206,12 +305,50 @@ const loginError = ref('')
 const loadError = ref('')
 const data = ref(null)
 const photoTab = ref('groom')
-const deletingKey = ref('')
+
+const deleteMode = ref(false)
+const selectedKeys = ref(new Set())
+const showDeleteModal = ref(false)
+const deletePasswordInput = ref('')
+const deleteModalError = ref('')
+const deleting = ref(false)
+const settingsUpdating = ref(false)
+const settingsError = ref('')
 
 const currentPhotos = computed(() => {
   if (!data.value) return []
   return data.value.photos[photoTab.value] ?? []
 })
+
+const selectedCount = computed(() => selectedKeys.value.size)
+
+function selectionKey({ resource, id, side }) {
+  return `${resource}:${id}:${side ?? ''}`
+}
+
+function isSelected(resource, id, side) {
+  return selectedKeys.value.has(selectionKey({ resource, id, side }))
+}
+
+function toggleSelect(item) {
+  const key = selectionKey(item)
+  const next = new Set(selectedKeys.value)
+  if (next.has(key)) {
+    next.delete(key)
+  } else {
+    next.add(key)
+  }
+  selectedKeys.value = next
+}
+
+function parseSelectedItems() {
+  return [...selectedKeys.value].map((key) => {
+    const [resource, id, side] = key.split(':')
+    const item = { resource, id }
+    if (side) item.side = side
+    return item
+  })
+}
 
 function sideLabel(side) {
   return side === 'groom' ? '신랑' : '신부'
@@ -228,23 +365,65 @@ function formatDate(iso) {
   })
 }
 
-function isDeleting(resource, id) {
-  return deletingKey.value === `${resource}:${id}`
+async function togglePhotoUpload() {
+  if (!data.value?.settings) return
+  settingsUpdating.value = true
+  settingsError.value = ''
+  const next = !data.value.settings.photoUploadOpen
+  try {
+    const result = await updatePhotoUploadSetting(storedPassword.value, next)
+    data.value.settings.photoUploadOpen = result.settings.photoUploadOpen
+  } catch (err) {
+    settingsError.value = err.message || '설정 변경에 실패했습니다'
+  } finally {
+    settingsUpdating.value = false
+  }
 }
 
-async function confirmDelete(resource, id, side, label) {
-  const name = label || id
-  const ok = window.confirm(`"${name}" 항목을 삭제할까요?\n되돌릴 수 없습니다.`)
-  if (!ok) return
+function enterDeleteMode() {
+  deleteMode.value = true
+  selectedKeys.value = new Set()
+}
 
-  deletingKey.value = `${resource}:${id}`
+function exitDeleteMode() {
+  deleteMode.value = false
+  selectedKeys.value = new Set()
+  closeDeleteModal()
+}
+
+function openDeleteModal() {
+  deleteModalError.value = ''
+  deletePasswordInput.value = ''
+  showDeleteModal.value = true
+}
+
+function closeDeleteModal() {
+  showDeleteModal.value = false
+  deletePasswordInput.value = ''
+  deleteModalError.value = ''
+}
+
+async function submitDelete() {
+  if (!deletePasswordInput.value) {
+    deleteModalError.value = '삭제 비밀번호를 입력하세요'
+    return
+  }
+
+  deleting.value = true
+  deleteModalError.value = ''
   try {
-    await deleteAdminItem(storedPassword.value, { resource, id, side })
+    const items = parseSelectedItems()
+    const result = await deleteAdminItems(storedPassword.value, deletePasswordInput.value, items)
+    closeDeleteModal()
+    exitDeleteMode()
     await loadData(storedPassword.value, { silent: true })
+    if (result.failedCount > 0) {
+      window.alert(`${result.deletedCount}개 삭제, ${result.failedCount}개 실패했습니다`)
+    }
   } catch (err) {
-    window.alert(err.message || '삭제에 실패했습니다')
+    deleteModalError.value = err.message || '삭제에 실패했습니다'
   } finally {
-    deletingKey.value = ''
+    deleting.value = false
   }
 }
 
@@ -253,6 +432,9 @@ async function loadData(password, { silent = false } = {}) {
   loadError.value = ''
   try {
     data.value = await fetchAdminData(password)
+    if (!data.value.settings) {
+      data.value.settings = { photoUploadOpen: false }
+    }
     authenticated.value = true
     sessionStorage.setItem(STORAGE_KEY, password)
     storedPassword.value = password
@@ -279,6 +461,7 @@ async function login() {
 }
 
 function logout() {
+  exitDeleteMode()
   sessionStorage.removeItem(STORAGE_KEY)
   authenticated.value = false
   storedPassword.value = ''
@@ -312,11 +495,22 @@ onMounted(async () => {
   min-height: 100vh;
 }
 
+.admin--delete-mode {
+  padding-bottom: 6rem;
+}
+
 .admin__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 2rem;
+}
+
+.admin__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .admin__title {
@@ -324,6 +518,21 @@ onMounted(async () => {
   font-size: 1.5rem;
   font-weight: 600;
   color: #333;
+}
+
+.admin__mode-btn {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  color: #c0392b;
+  background: #fff;
+  border: 1px solid #e8b4b0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.admin__mode-btn--cancel {
+  color: var(--color-text-muted, #888);
+  border-color: #ddd;
 }
 
 .admin__logout {
@@ -339,6 +548,16 @@ onMounted(async () => {
 .admin__logout:hover {
   border-color: var(--color-primary-dark, #e8899e);
   color: var(--color-primary-dark, #e8899e);
+}
+
+.admin__delete-hint {
+  margin: -1rem 0 1.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  color: #8a5a00;
+  background: #fff8e6;
+  border: 1px solid #f0d78c;
+  border-radius: 6px;
 }
 
 .admin__login {
@@ -457,6 +676,56 @@ onMounted(async () => {
   color: #333;
 }
 
+.admin__settings-card {
+  padding: 1.25rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 6%);
+}
+
+.admin__settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin__settings-label {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.admin__settings-desc {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #888);
+}
+
+.admin__toggle {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  color: #c0392b;
+  background: #fdecea;
+  border: 1px solid #e8b4b0;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admin__toggle--on {
+  color: #27ae60;
+  background: #eafaf1;
+  border-color: #a8dfc0;
+}
+
+.admin__toggle:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .admin__table-wrap {
   overflow-x: auto;
   background: #fff;
@@ -482,6 +751,19 @@ onMounted(async () => {
   font-size: 0.8rem;
   color: var(--color-text-muted, #888);
   background: #fafafa;
+}
+
+.admin__check-col {
+  width: 2.5rem;
+  text-align: center;
+}
+
+.admin__row--selected {
+  background: #fff5f7;
+}
+
+.admin--delete-mode .admin__table tbody tr {
+  cursor: pointer;
 }
 
 .admin__message {
@@ -538,10 +820,34 @@ onMounted(async () => {
 }
 
 .admin__photo-item {
+  position: relative;
   background: #fff;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 4px rgb(0 0 0 / 6%);
+}
+
+.admin--delete-mode .admin__photo-item {
+  cursor: pointer;
+}
+
+.admin__photo-item--selected {
+  outline: 2px solid #c0392b;
+  outline-offset: 2px;
+}
+
+.admin__photo-check {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
 }
 
 .admin__photo-thumb {
@@ -581,34 +887,104 @@ onMounted(async () => {
   background: var(--color-accent, #fff0f3);
 }
 
-.admin__actions {
-  width: 1%;
-  white-space: nowrap;
+.admin__delete-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: #fff;
+  border-top: 1px solid #f0d0d0;
+  box-shadow: 0 -4px 16px rgb(0 0 0 / 8%);
 }
 
-.admin__delete {
-  padding: 0.3rem 0.55rem;
-  font-size: 0.75rem;
-  color: #c0392b;
-  background: #fff;
-  border: 1px solid #e8b4b0;
+.admin__delete-count {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.admin__delete-submit {
+  padding: 0.55rem 1.25rem;
+  font-size: 0.9rem;
+  color: #fff;
+  background: #c0392b;
+  border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.admin__delete:hover:not(:disabled) {
-  background: #fdecea;
-}
-
-.admin__delete:disabled {
+.admin__delete-submit:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.admin__delete--photo {
-  display: block;
+.admin__modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.admin__modal {
   width: 100%;
-  margin-top: 0.5rem;
-  padding: 0.4rem;
+  max-width: 360px;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 15%);
+}
+
+.admin__modal-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.admin__modal-desc {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-muted, #888);
+}
+
+.admin__modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.admin__modal-cancel,
+.admin__modal-confirm {
+  flex: 1;
+  padding: 0.6rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.admin__modal-cancel {
+  color: var(--color-text-muted, #888);
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+.admin__modal-confirm {
+  color: #fff;
+  background: #c0392b;
+  border: none;
+}
+
+.admin__modal-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

@@ -3,6 +3,7 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { getPhotoUploadOpen } from '../lib/settings.js'
 
 const VALID_SIDES = ['groom', 'bride']
 const PRESIGN_EXPIRES_IN = 300
@@ -37,6 +38,11 @@ export async function handler(event) {
     }
     if (!fileName || !contentType) {
       return jsonResponse(400, { message: 'fileName and contentType are required' })
+    }
+
+    const uploadOpen = await getPhotoUploadOpen()
+    if (!uploadOpen) {
+      return jsonResponse(403, { message: 'Photo upload is not open yet' })
     }
 
     const photoId = randomUUID()

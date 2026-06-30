@@ -13,6 +13,71 @@
 
 ---
 
+## 환경 변수·Secret 전체 목록
+
+청첩장은 **GitHub Secrets(백엔드 배포)** + **Vercel Environment Variables(프론트 빌드)** + (선택) **로컬 `.env.local`** 로 나뉩니다.  
+**Secret/변수를 바꾼 뒤에는 아래 “반영 방법”대로 재배포**해야 적용됩니다.
+
+### GitHub Actions Secrets (백엔드)
+
+저장소 → **Settings** → **Secrets and variables** → **Actions**
+
+| Secret | 필수 | SAM 파라미터 / 용도 | 값 예시 | 변경 후 반영 |
+|--------|------|---------------------|---------|--------------|
+| `AWS_ACCESS_KEY_ID` | ✅ | IAM 배포 인증 | — | Secret 저장 후 Actions 재실행 |
+| `AWS_SECRET_ACCESS_KEY` | ✅ | IAM 배포 인증 | — | Secret 저장 후 Actions 재실행 |
+| `AWS_REGION` | ✅ | 배포 리전 | `ap-northeast-2` | Secret 저장 후 Actions 재실행 |
+| `ADMIN_PASSWORD` | ✅ | `AdminPassword` → Lambda `ADMIN_PASSWORD` · `/admin` **로그인·조회** | 본인 설정 | **backend push** → Deploy Backend |
+| `DELETE_PASSWORD` | ✅ | `DeletePassword` → Lambda `DELETE_PASSWORD` · `/admin` **데이터 삭제** 시 2차 확인 | 본인 설정 (**ADMIN과 다르게**) | **backend push** → Deploy Backend |
+| `FRONTEND_ORIGIN` | ✅ | `FrontendOrigin` → API Gateway **CORS** 허용 origin | `https://mobile-wedding-invitation-vert.vercel.app` | **backend push** → Deploy Backend |
+
+GitHub Actions는 deploy 시 아래처럼 SAM에 넘깁니다 (`.github/workflows/deploy-backend.yml`):
+
+```bash
+--parameter-overrides \
+  "AdminPassword=${{ secrets.ADMIN_PASSWORD }} \
+   DeletePassword=${{ secrets.DELETE_PASSWORD }} \
+   FrontendOrigin=${FRONTEND_ORIGIN}"
+```
+
+> `FRONTEND_ORIGIN` Secret이 **비어 있으면** CORS는 `http://localhost:5173`만 허용됩니다. Vercel URL로 접속하면 CORS 오류가 납니다.
+
+### Vercel Environment Variables (프론트)
+
+프로젝트 → **Settings** → **Environment Variables**
+
+| 변수 | 필수 | 용도 | 값 예시 | 변경 후 반영 |
+|------|------|------|---------|--------------|
+| `VITE_API_BASE_URL` | ✅ | 브라우저 → AWS API 주소 | CloudFormation **ApiEndpoint** 전체 | Vercel **Redeploy** (빌드 시 박힘) |
+| `VITE_KAKAO_JS_KEY` | ⬜ | 카카오톡 공유·지도 (사용 시) | [Kakao Developers](https://developers.kakao.com) JS 키 | Vercel **Redeploy** |
+
+### 로컬 개발용 (`.env.local` / SAM)
+
+| 파일 / 옵션 | 변수 | 용도 |
+|-------------|------|------|
+| `frontend/.env.local` | `VITE_API_BASE_URL` | 로컬 API (`http://127.0.0.1:3000`) |
+| `frontend/.env.local` | `VITE_KAKAO_JS_KEY` | 카카오 기능 로컬 테스트 |
+| `sam local start-api --parameter-overrides` | `AdminPassword`, `DeletePassword`, `FrontendOrigin` | 로컬 Lambda 환경 |
+
+### 비밀번호 두 개 — 왜 나뉘나?
+
+| | `ADMIN_PASSWORD` | `DELETE_PASSWORD` |
+|--|------------------|-------------------|
+| **설정 위치** | GitHub Secret | GitHub Secret |
+| **쓰는 곳** | `/admin` 로그인, 데이터 **조회** | `/admin` **삭제 확인** 모달 |
+| **API** | 헤더 `X-Admin-Password` | body `deletePassword` (`POST /admin/delete`) |
+| **권장** | 일상적으로 `/admin` 접속용 | RSVP·방명록·사진 **삭제할 때만** 입력 |
+
+**같은 값을 써도 동작은 하지만**, 실수로 삭제하는 것을 줄이려면 **서로 다른 비밀번호**를 권장합니다.
+
+### DynamoDB 설정 (환경 변수 아님)
+
+| 항목 | 저장 위치 | 제어 |
+|------|-----------|------|
+| 게스트 **사진 업로드 허용/차단** | DynamoDB `CONFIG` / `APP` · `photoUploadOpen` | `/admin` → **설정** 토글 (즉시 반영, 재배포 불필요) |
+
+---
+
 ## 관리자 대시보드
 
 | 항목 | 값 |
@@ -21,7 +86,9 @@
 | API | `GET /admin/data` |
 | 인증 | 요청 헤더 `X-Admin-Password` (= GitHub Secret `ADMIN_PASSWORD`) |
 
-RSVP · 방명록 · 게스트 사진 요약을 한 번에 볼 수 있습니다.
+RSVP · 방명록 · 게스트 사진 요약을 한 번에 볼 수 있습니다.  
+**데이터 삭제:** 상단 **데이터 삭제** → 항목 선택 → **선택 삭제** → `DELETE_PASSWORD` 입력 (GitHub Secret과 동일).  
+**사진 업로드:** **설정** 섹션에서 **허용/차단** 토글 (DynamoDB에 저장, API에서도 검증).
 
 ---
 
@@ -40,15 +107,43 @@ RSVP · 방명록 · 게스트 사진 요약을 한 번에 볼 수 있습니다.
 
 ### 3. GitHub Secrets
 
-저장소 → **Settings** → **Secrets and variables** → **Actions**
+저장소 → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
+
+아래 **6개를 모두** 등록한 뒤 `backend/`를 push해 **Deploy Backend**가 성공하는지 확인하세요.
 
 | Secret | 예시 | 용도 |
 |--------|------|------|
 | `AWS_ACCESS_KEY_ID` | — | 배포 인증 |
 | `AWS_SECRET_ACCESS_KEY` | — | 배포 인증 |
 | `AWS_REGION` | `ap-northeast-2` | 배포 리전 |
-| `ADMIN_PASSWORD` | (본인 설정) | 관리자 API·`/admin` 비밀번호 |
-| `FRONTEND_ORIGIN` | `https://mobile-wedding-invitation.vercel.app` | API CORS 허용 origin (**정확한 URL**, 와일드카드 불가) |
+| `ADMIN_PASSWORD` | (본인 설정) | 관리자 로그인·`/admin` 조회 |
+| `DELETE_PASSWORD` | (본인 설정) | `/admin`에서 데이터 **삭제** 시 2차 확인 |
+| `FRONTEND_ORIGIN` | `https://mobile-wedding-invitation-vert.vercel.app` | API CORS 허용 origin (**정확한 URL**, 와일드카드 불가) |
+
+#### `ADMIN_PASSWORD` 등록
+
+1. GitHub → 저장소 **Settings** → **Secrets and variables** → **Actions**
+2. **New repository secret** → Name: `ADMIN_PASSWORD`, Value: 원하는 비밀번호
+3. `/admin` 로그인·RSVP/방명록/사진 **조회**에 사용
+4. 등록·변경 후 **`backend/` 변경을 push** → Actions가 SAM deploy → Lambda에 반영
+
+#### `DELETE_PASSWORD` 등록
+
+1. **New repository secret** → Name: `DELETE_PASSWORD`, Value: 원하는 비밀번호  
+   → **`ADMIN_PASSWORD`와 다른 값**을 권장 (삭제 실수 방지)
+2. `/admin` → **데이터 삭제** → 항목 선택 → **선택 삭제** 모달에서 입력하는 비밀번호와 **동일**해야 함
+3. Secret만 추가하고 **backend를 재배포하지 않으면** Lambda에 `DELETE_PASSWORD`가 없어 삭제 API가 `503 Delete access is not configured` 를 반환할 수 있음
+4. 등록·변경 후 반드시 **`backend/` push** → **Deploy Backend** 성공 확인
+
+#### `FRONTEND_ORIGIN` 등록
+
+`VITE_API_BASE_URL`(Vercel)과 **다른 값**입니다. 브라우저 **청첩장 URL(origin)** 을 넣습니다.
+
+- ✅ `https://mobile-wedding-invitation-vert.vercel.app`
+- ❌ `https://xxx.execute-api.../prod` (API URL)
+- ❌ 끝에 `/` · `/admin` 경로
+
+등록·변경 후 **`backend/` push**로 재배포해야 CORS에 반영됩니다. (아래 **값 찾는 방법** 참고)
 
 `FRONTEND_ORIGIN`은 Vercel에 실제로 열리는 주소와 **완전히 동일**해야 합니다. 끝에 `/` 없이 입력하세요.
 
@@ -142,19 +237,32 @@ curl -s "https://YOUR_API_ID.execute-api.ap-northeast-2.amazonaws.com/prod/guest
 | Name | Value | Environment |
 |------|-------|-------------|
 | `VITE_API_BASE_URL` | 위에서 복사한 `ApiEndpoint` 전체 | **Production** (Preview도 쓰면 같이 체크) |
+| `VITE_KAKAO_JS_KEY` | (선택) 카카오 JavaScript 키 | Production |
+
+#### `VITE_KAKAO_JS_KEY` (선택)
+
+카카오톡 **공유하기**·**지도** 등을 쓸 때만 필요합니다.
+
+1. [Kakao Developers](https://developers.kakao.com) → 앱 → **앱 키** → **JavaScript 키**
+2. Vercel에 `VITE_KAKAO_JS_KEY`로 등록
+3. **Redeploy**
+4. [플랫폼]에 Vercel 도메인(`https://xxx.vercel.app`) 등록 필요
+
+없으면 카카오 공유 버튼만 비활성화되고, RSVP·방명록·사진 업로드는 정상 동작합니다.
 
 3. **Deployments** → 최신 배포 → **⋯** → **Redeploy**  
    (Vite는 **빌드할 때** 이 값을 코드에 박아 넣으므로, 변수만 추가하고 Redeploy 안 하면 반영되지 않음)
 
 #### 로컬 개발용 (Vercel이 아닌 내 PC)
 
-`frontend/.env.local` 파일:
+`frontend/.env.local` 예시:
 
-```
+```env
 VITE_API_BASE_URL=http://127.0.0.1:3000
+# VITE_KAKAO_JS_KEY=your-kakao-js-key
 ```
 
-(`sam local start-api` 실행 중일 때. Vite dev 서버의 `/api` 프록시를 쓰려면 `http://localhost:5173`에서 `/api`로도 가능)
+(`sam local start-api` 실행 중일 때. Vite dev 서버의 `/api` 프록시를 쓰려면 `vite.config.js`의 proxy + `VITE_API_BASE_URL` 생략도 가능)
 
 #### GitHub Secret vs Vercel 변수 (헷갈리기 쉬움)
 
@@ -162,8 +270,11 @@ VITE_API_BASE_URL=http://127.0.0.1:3000
 |------|-----------|------|
 | `FRONTEND_ORIGIN` | **GitHub** Secrets | AWS API가 **어느 웹사이트 origin을 CORS로 허용할지** |
 | `VITE_API_BASE_URL` | **Vercel** Environment Variables | 브라우저가 **어느 AWS API URL로 요청을 보낼지** |
+| `DELETE_PASSWORD` | **GitHub** Secrets (Lambda env) | `/admin` **삭제 API** 검증 (프론트에 저장하지 않음) |
+| `ADMIN_PASSWORD` | **GitHub** Secrets (Lambda env) | `/admin` **조회 API** 검증 |
 
-둘 다 필요합니다. 하나만 설정하면 `/admin`에서 `Unexpected token '<'` 또는 CORS 오류가 날 수 있습니다.
+**최소 조합:** GitHub 6개 Secret + Vercel `VITE_API_BASE_URL` + Redeploy.  
+하나만 빠져도 `/admin`에서 `Unexpected token '<'` 또는 CORS 오류가 날 수 있습니다.
 
 ### 5. 배포 트리거
 
@@ -171,22 +282,50 @@ VITE_API_BASE_URL=http://127.0.0.1:3000
 
 ### 6. 로컬 개발
 
+**백엔드**
+
 ```bash
 cd backend
 npm ci
 sam build
-sam local start-api --parameter-overrides AdminPassword=YOUR_PASSWORD
+sam local start-api --parameter-overrides \
+  "AdminPassword=YOUR_ADMIN_PASSWORD \
+   DeletePassword=YOUR_DELETE_PASSWORD \
+   FrontendOrigin=http://localhost:5173"
 ```
 
-프론트는 `frontend/.env.local`에 `VITE_API_BASE_URL=http://127.0.0.1:3000` 설정 후 `npm run dev`. (자세한 값은 위 **§4 Vercel 환경 변수** 참고)
+| 파라미터 | 대응 Secret | 용도 |
+|----------|-------------|------|
+| `AdminPassword` | `ADMIN_PASSWORD` | `/admin` 로그인·조회 |
+| `DeletePassword` | `DELETE_PASSWORD` | `/admin` 삭제 |
+| `FrontendOrigin` | (로컬) | CORS — 로컬 프론트 `http://localhost:5173` |
+
+**프론트**
+
+```bash
+cd frontend
+cp .env.example .env.local   # VITE_API_BASE_URL=http://127.0.0.1:3000
+npm run dev
+```
+
+로컬에서 `/admin`·삭제·업로드 토글까지 테스트하려면 **배포된 AWS API**를 쓰는 편이 낫습니다 (`VITE_API_BASE_URL`=CloudFormation ApiEndpoint).  
+`sam local`은 RSVP·방명록 등 기본 API smoke test용입니다.
 
 ### 배포 체크리스트 (순서)
 
-1. GitHub Secrets 5개 설정 (`AWS_*`, `ADMIN_PASSWORD`, `FRONTEND_ORIGIN`)
+1. GitHub Secrets **6개** 설정 (`AWS_*`, `ADMIN_PASSWORD`, `DELETE_PASSWORD`, `FRONTEND_ORIGIN`)
 2. `main` push → **Deploy Backend** 성공
 3. §4 **`ApiEndpoint` 값 찾는 방법** → CloudFormation Outputs에서 URL 복사
-4. Vercel **`VITE_API_BASE_URL`** = 복사한 `ApiEndpoint` → **Redeploy**
-5. 청첩장·`/admin` 동작 확인
+4. Vercel **`VITE_API_BASE_URL`** = 복사한 `ApiEndpoint` → (선택) `VITE_KAKAO_JS_KEY` → **Redeploy**
+5. 청첩장·`/admin` 로그인·삭제·업로드 토글 동작 확인
+
+### Secret/변수 변경 시 재배포 요약
+
+| 변경한 것 | 해야 할 일 |
+|-----------|------------|
+| `ADMIN_PASSWORD` / `DELETE_PASSWORD` / `FRONTEND_ORIGIN` | GitHub Secret 저장 → `backend/` push (Deploy Backend) |
+| `VITE_API_BASE_URL` / `VITE_KAKAO_JS_KEY` | Vercel Env 저장 → **Redeploy** |
+| `/admin` 사진 업로드 허용/차단 | `/admin` 설정 토글만 (재배포 불필요) |
 
 ---
 
@@ -383,7 +522,9 @@ echo "Done."
 | `POST` | `/photos/presign` | 사진 업로드용 presigned URL |
 | `GET` | `/photos?side=groom\|bride` | 사진 목록 |
 | `GET` | `/admin/data` | 관리자 통합 조회 (비밀번호 필요) |
-| `POST` | `/admin/delete` | 관리자 항목 삭제 (비밀번호 필요, body: `resource`, `id`, `side`) |
+| `POST` | `/admin/delete` | 관리자 일괄 삭제 (`deletePassword` + `items[]`) |
+| `GET` | `/photos/upload-status` | 사진 업로드 허용 여부 (공개) |
+| `POST` | `/admin/settings` | 사진 업로드 허용 설정 (`photoUploadOpen`) |
 
 ---
 
@@ -392,6 +533,9 @@ echo "Done."
 | 증상 | 확인 사항 |
 |------|-----------|
 | `/admin`에서 `Unexpected token '<'` / `<!doctype` JSON 오류 | **Vercel에 `VITE_API_BASE_URL` 미설정** 또는 Redeploy 안 함 → §4 참고 |
+| `/admin` 삭제 시 `삭제 기능이 설정되지 않았습니다` | GitHub **`DELETE_PASSWORD` Secret 없음** 또는 backend **재배포 안 함** |
+| `/admin` 삭제 시 `삭제 비밀번호가 올바르지 않습니다` | 모달 입력값 ≠ GitHub Secret **`DELETE_PASSWORD`** |
+| `/admin` 로그인 실패 | GitHub **`ADMIN_PASSWORD`** ≠ 입력값, 또는 backend 재배포 필요 |
 | Actions `esbuild` 오류 | `package.json`에 `esbuild`가 `dependencies`에 있는지 |
 | `Duplicated values in allow-origins` | CORS origin 중복 제거 (`FrontendOrigin` 하나만) |
 | `wildcards` CORS 오류 | `FRONTEND_ORIGIN`에 정확한 Vercel URL 사용 (와일드카드 불가) |

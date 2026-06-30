@@ -25,6 +25,11 @@ Parameters:
     NoEcho: true
     Default: ''
     Description: Password for admin dashboard access (set via GitHub Secret ADMIN_PASSWORD)
+  DeletePassword:
+    Type: String
+    NoEcho: true
+    Default: ''
+    Description: Password required to delete data (set via GitHub Secret DELETE_PASSWORD)
 
 Resources:
   PhotosTable:
@@ -224,6 +229,10 @@ Resources:
     Properties:
       CodeUri: .
       Handler: adminDelete.handler
+      Timeout: 30
+      Environment:
+        Variables:
+          DELETE_PASSWORD: !Ref DeletePassword
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PhotosTable
@@ -236,6 +245,54 @@ Resources:
             ApiId: !Ref HttpApi
             Path: /admin/delete
             Method: POST
+
+  AdminUpdateSettingsFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/adminUpdateSettings.js
+    Properties:
+      CodeUri: .
+      Handler: adminUpdateSettings.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PhotosTable
+      Events:
+        AdminUpdateSettingsApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /admin/settings
+            Method: POST
+
+  GetPhotoUploadStatusFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/getPhotoUploadStatus.js
+    Properties:
+      CodeUri: .
+      Handler: getPhotoUploadStatus.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref PhotosTable
+      Events:
+        GetPhotoUploadStatusApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /photos/upload-status
+            Method: GET
 
   ListGuestbookFunction:
     Type: AWS::Serverless::Function

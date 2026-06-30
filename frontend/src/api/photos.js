@@ -3,6 +3,9 @@ import { getApiBaseUrl, parseJsonResponse, readApiErrorMessage } from './client.
 async function handleResponse(response) {
   if (!response.ok) {
     const message = await readApiErrorMessage(response, `API error: ${response.status}`)
+    if (response.status === 403) {
+      throw new Error('지금은 사진 업로드 기간이 아닙니다')
+    }
     throw new Error(message)
   }
   return parseJsonResponse(response)
@@ -28,7 +31,7 @@ export async function uploadToS3(uploadUrl, file, contentType) {
   }
 }
 
-export async function listPhotos(side) {
-  const response = await fetch(`${getApiBaseUrl()}/photos?side=${encodeURIComponent(side)}`)
+export async function getPhotoUploadStatus() {
+  const response = await fetch(`${getApiBaseUrl()}/photos/upload-status`)
   return handleResponse(response)
 }
