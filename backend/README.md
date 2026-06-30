@@ -52,11 +52,124 @@ RSVP · 방명록 · 게스트 사진 요약을 한 번에 볼 수 있습니다.
 
 `FRONTEND_ORIGIN`은 Vercel에 실제로 열리는 주소와 **완전히 동일**해야 합니다. 끝에 `/` 없이 입력하세요.
 
-### 4. 배포 트리거
+### 4. Vercel 환경 변수 (백엔드 배포 후 **필수**)
+
+> GitHub Actions로 백엔드만 배포했다고 청첩장·`/admin`이 동작하지 **않습니다.**  
+> 프론트(Vercel)에 **API 주소**를 따로 넣고 **Redeploy**해야 RSVP·방명록·사진·관리자 페이지가 AWS와 연결됩니다.
+
+#### `VITE_API_BASE_URL`에 넣을 값
+
+**AWS CloudFormation Output의 `ApiEndpoint` 값을 그대로** 넣습니다.
+
+형식 예시 (본인 값은 콘솔에 표시된 그대로 사용):
+
+```
+https://abc123xyz.execute-api.ap-northeast-2.amazonaws.com/prod
+```
+
+| 규칙 | 설명 |
+|------|------|
+| ✅ 넣을 것 | `https://`로 시작하는 **AWS API Gateway URL** |
+| ✅ 끝 경로 | 반드시 **`/prod`** 포함 (SAM `StageName: prod`) |
+| ❌ 넣으면 안 됨 | Vercel 청첩장 URL (`https://xxx.vercel.app`) |
+| ❌ 넣으면 안 됨 | 끝에 `/` (`.../prod/`) |
+| ❌ 넣으면 안 됨 | `/admin`, `/rsvp` 등 경로 추가 |
+
+#### `ApiEndpoint` 값 찾는 방법
+
+##### 방법 A — CloudFormation (가장 쉬움, 권장)
+
+1. [AWS Console](https://console.aws.amazon.com) 로그인
+2. 우측 상단 리전이 **`ap-northeast-2`(서울)** 인지 확인 (다른 리전이면 스택이 안 보일 수 있음)
+3. 상단 검색창에 **`CloudFormation`** 입력 → **CloudFormation** 클릭
+4. 스택 목록에서 **`mobile-wedding-invitation`** 클릭  
+   - 없으면 GitHub **Deploy Backend** Actions가 성공했는지 확인
+5. 상단 탭 **Outputs** 클릭
+6. **ApiEndpoint** 행의 **Value** 열 URL 전체를 복사  
+   - 예: `https://1a2b3c4d5e.execute-api.ap-northeast-2.amazonaws.com/prod`
+7. 복사한 문자열을 Vercel `VITE_API_BASE_URL`에 붙여넣기
+
+##### 방법 B — API Gateway 콘솔
+
+1. AWS Console → 리전 **`ap-northeast-2`**
+2. 검색창 **`API Gateway`** → **API Gateway** 클릭
+3. 왼쪽 **API** 목록에서 HTTP API 선택 (이름에 `mobile-wedding-invitation` 또는 `HttpApi` 포함)
+4. **Stages** → **`prod`** 스택 선택
+5. **Invoke URL** 표시값 + 스테이지 경로 → 보통 `https://{api-id}.execute-api.ap-northeast-2.amazonaws.com/prod` 형태  
+   → 이 **Invoke URL 전체**가 `ApiEndpoint`와 동일
+
+##### 방법 C — AWS CLI
+
+로컬 또는 [CloudShell](https://console.aws.amazon.com/cloudshell)에서:
+
+```bash
+aws cloudformation describe-stacks \
+  --stack-name mobile-wedding-invitation \
+  --region ap-northeast-2 \
+  --query "Stacks[0].Outputs[?OutputKey=='ApiEndpoint'].OutputValue" \
+  --output text
+```
+
+출력된 한 줄 URL을 그대로 `VITE_API_BASE_URL`에 사용합니다.
+
+##### 복사한 값이 맞는지 확인
+
+터미널에서 (URL을 본인 값으로 바꿔 실행):
+
+```bash
+curl -s "https://YOUR_API_ID.execute-api.ap-northeast-2.amazonaws.com/prod/guestbook"
+```
+
+`[]` 또는 JSON 배열/객체가 보이면 API 주소가 맞습니다.  
+`<!doctype html>` 이 나오면 URL이 잘못되었거나 Vercel 주소를 넣은 경우입니다.
+
+##### `FRONTEND_ORIGIN`(GitHub Secret) 값 찾는 방법
+
+`VITE_API_BASE_URL`과는 **다른 값**입니다. Vercel **청첩장 사이트 주소**를 넣습니다.
+
+1. [Vercel](https://vercel.com) → 해당 프로젝트
+2. **Deployments** → **Production** 배포 클릭
+3. **Domains**에 표시된 URL 복사 (예: `https://mobile-wedding-invitation.vercel.app`)
+4. GitHub → 저장소 **Settings** → **Secrets and variables** → **Actions** → `FRONTEND_ORIGIN`에 붙여넣기
+5. 끝에 `/` 없이, `https://` 포함한 **origin만** (경로 `/admin` 등 붙이지 않음)
+6. Secret 저장 후 `backend/` 변경을 push해 백엔드를 한 번 재배포 (CORS 반영)
+
+#### Vercel에 등록하는 방법
+
+1. [Vercel](https://vercel.com) → 해당 프로젝트 → **Settings** → **Environment Variables**
+2. 추가:
+
+| Name | Value | Environment |
+|------|-------|-------------|
+| `VITE_API_BASE_URL` | 위에서 복사한 `ApiEndpoint` 전체 | **Production** (Preview도 쓰면 같이 체크) |
+
+3. **Deployments** → 최신 배포 → **⋯** → **Redeploy**  
+   (Vite는 **빌드할 때** 이 값을 코드에 박아 넣으므로, 변수만 추가하고 Redeploy 안 하면 반영되지 않음)
+
+#### 로컬 개발용 (Vercel이 아닌 내 PC)
+
+`frontend/.env.local` 파일:
+
+```
+VITE_API_BASE_URL=http://127.0.0.1:3000
+```
+
+(`sam local start-api` 실행 중일 때. Vite dev 서버의 `/api` 프록시를 쓰려면 `http://localhost:5173`에서 `/api`로도 가능)
+
+#### GitHub Secret vs Vercel 변수 (헷갈리기 쉬움)
+
+| 이름 | 설정 위치 | 역할 |
+|------|-----------|------|
+| `FRONTEND_ORIGIN` | **GitHub** Secrets | AWS API가 **어느 웹사이트 origin을 CORS로 허용할지** |
+| `VITE_API_BASE_URL` | **Vercel** Environment Variables | 브라우저가 **어느 AWS API URL로 요청을 보낼지** |
+
+둘 다 필요합니다. 하나만 설정하면 `/admin`에서 `Unexpected token '<'` 또는 CORS 오류가 날 수 있습니다.
+
+### 5. 배포 트리거
 
 `main` 브랜치에 `backend/` 또는 `.github/workflows/deploy-backend.yml` 변경을 push하면 **Deploy Backend** 워크플로가 실행됩니다.
 
-### 5. 로컬 개발
+### 6. 로컬 개발
 
 ```bash
 cd backend
@@ -65,7 +178,15 @@ sam build
 sam local start-api --parameter-overrides AdminPassword=YOUR_PASSWORD
 ```
 
-프론트는 `frontend/.env.local`에 `VITE_API_BASE_URL=http://127.0.0.1:3000` 설정 후 `npm run dev`.
+프론트는 `frontend/.env.local`에 `VITE_API_BASE_URL=http://127.0.0.1:3000` 설정 후 `npm run dev`. (자세한 값은 위 **§4 Vercel 환경 변수** 참고)
+
+### 배포 체크리스트 (순서)
+
+1. GitHub Secrets 5개 설정 (`AWS_*`, `ADMIN_PASSWORD`, `FRONTEND_ORIGIN`)
+2. `main` push → **Deploy Backend** 성공
+3. §4 **`ApiEndpoint` 값 찾는 방법** → CloudFormation Outputs에서 URL 복사
+4. Vercel **`VITE_API_BASE_URL`** = 복사한 `ApiEndpoint` → **Redeploy**
+5. 청첩장·`/admin` 동작 확인
 
 ---
 
@@ -111,15 +232,17 @@ curl -s "$API/admin/data" -H "X-Admin-Password: YOUR_PASSWORD" | head
 
 JSON이 정상 반환되면 API·Lambda·DynamoDB 연동은 동작 중입니다.
 
-### 4) 프론트 연동
+### 4) 프론트 연동 (Vercel)
 
-Vercel **Environment Variables**:
+**반드시** §4 **Vercel 환경 변수**대로 설정합니다.
 
 ```
-VITE_API_BASE_URL=<CloudFormation Output의 ApiEndpoint>
+VITE_API_BASE_URL=https://xxxxxxxx.execute-api.ap-northeast-2.amazonaws.com/prod
 ```
 
-설정 후 **Redeploy** → 청첩장에서 RSVP·방명록·사진 업로드·`/admin` 접속을 각각 한 번씩 테스트합니다.
+↑ `xxxxxxxx` 부분은 본인 스택의 `ApiEndpoint`에서 확인. **Redeploy 필수.**
+
+설정 후 청첩장에서 RSVP·방명록·사진 업로드·`/admin` 접속을 각각 한 번씩 테스트합니다.
 
 ### 5) CORS 문제가 날 때
 
@@ -267,8 +390,9 @@ echo "Done."
 
 | 증상 | 확인 사항 |
 |------|-----------|
+| `/admin`에서 `Unexpected token '<'` / `<!doctype` JSON 오류 | **Vercel에 `VITE_API_BASE_URL` 미설정** 또는 Redeploy 안 함 → §4 참고 |
 | Actions `esbuild` 오류 | `package.json`에 `esbuild`가 `dependencies`에 있는지 |
 | `Duplicated values in allow-origins` | CORS origin 중복 제거 (`FrontendOrigin` 하나만) |
 | `wildcards` CORS 오류 | `FRONTEND_ORIGIN`에 정확한 Vercel URL 사용 (와일드카드 불가) |
 | `ROLLBACK_COMPLETE` | CloudFormation에서 스택 삭제 후 재배포 (워크플로 자동 처리 포함) |
-| 프론트에서 API 실패 | `VITE_API_BASE_URL`, `FRONTEND_ORIGIN` 일치 여부 |
+| 프론트에서 API 실패 (CORS) | `VITE_API_BASE_URL`(Vercel) + `FRONTEND_ORIGIN`(GitHub) 둘 다 확인 |
