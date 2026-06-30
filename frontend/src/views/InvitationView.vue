@@ -12,13 +12,11 @@
       alt="middle section photo"
       :placeholder-label="t.sectionPhoto.midHint"
     />
-    <DPlusDay />
     <GallerySection />
     <InformationSection />
-    <GuestbookSection />
-    <AccountSection />
     <RsvpForm />
-    <FlowerLink />
+    <AccountSection />
+    <GuestbookSection />
     <GuestGallery />
     <EndingSection />
   </div>
@@ -33,13 +31,11 @@ import InterviewSection from '../components/InterviewSection.vue'
 import WeddingDay from '../components/WeddingDay.vue'
 import LocationSection from '../components/LocationSection.vue'
 import SectionPhoto from '../components/SectionPhoto.vue'
-import DPlusDay from '../components/DPlusDay.vue'
 import GallerySection from '../components/GallerySection.vue'
 import InformationSection from '../components/InformationSection.vue'
 import GuestbookSection from '../components/GuestbookSection.vue'
 import AccountSection from '../components/AccountSection.vue'
 import RsvpForm from '../components/RsvpForm.vue'
-import FlowerLink from '../components/FlowerLink.vue'
 import GuestGallery from '../components/GuestGallery.vue'
 import EndingSection from '../components/EndingSection.vue'
 import { useInvitationContent } from '../composables/useInvitationContent'

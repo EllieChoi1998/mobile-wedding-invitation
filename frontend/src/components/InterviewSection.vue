@@ -39,7 +39,7 @@ import SectionHeader from './SectionHeader.vue'
 
 const { interview, couple, t } = useInvitationContent()
 
-const initialCount = 2
+const initialCount = 1
 const expanded = ref(false)
 
 const visibleItems = computed(() =>

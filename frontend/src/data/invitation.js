@@ -16,29 +16,31 @@ export const cover = {
 export const couple = {
   groom: {
     fullName: '조 문경',
-    birthDate: '1990년 12월 10일',
-    mbti: 'ISTP',
+    birthDate: '1992년 03월 20일',
+    mbti: 'INFP',
     tags: ['#캠핑', '#러닝'],
-    phone: '010-0000-0001',
+    phone: '010-9911-2146',
     photoPath: 'about/groom.jpg',
     account: {
       name: '조 문경',
-      bank: '국민은행',
+      bank: '하나은행',
       accountNumber: '123456-01-000001',
       holder: '조 문경',
     },
   },
   bride: {
     fullName: '최 혜령',
-    birthDate: '1993년 3월 14일',
-    mbti: 'ESTJ',
+    birthDate: '1998년 10월 08일',
+    mbti: 'ENTJ',
     tags: ['#스노우보드', '#캠핑'],
-    phone: '010-0000-0002',
+    phone: '010-4586-5811',
     photoPath: 'about/bride.jpg',
+    // About Us 사진 크롭 위치 (object-position). 가로 세로 — 예: 'center 50%'(기본), 'center 65%'(아래 더 보임), 'center bottom'
+    photoObjectPosition: 'center 55%',
     account: {
       name: '최 혜령',
-      bank: '카카오뱅크',
-      accountNumber: '3333-02-0000000',
+      bank: '신한은행',
+      accountNumber: '110-403-159435',
       holder: '최 혜령',
     },
   },
@@ -83,34 +85,35 @@ export const parents = {
     },
     mother: {
       name: '강 미선',
-      bank: '하나은행',
-      accountNumber: '123-456789-01234',
+      bank: '농협은행',
+      accountNumber: '302-0517-1545-11',
       holder: '강 미선',
     },
   },
 }
 
 export const contacts = [
-  { role: '신랑', name: '조 문경', phone: '010-0000-0001' },
-  { role: '신부', name: '최 혜령', phone: '010-0000-0002' },
-  { role: '신랑 아버지', name: '조 석영', phone: '010-0000-0003' },
-  { role: '신랑 어머니', name: '김 경화', phone: '010-0000-0004' },
-  { role: '신부 아버지', name: '최 태경', phone: '010-0000-0005' },
-  { role: '신부 어머니', name: '강 미선', phone: '010-0000-0006' },
+  { role: '신랑', name: '조 문경', phone: '010-9911-2146' },
+  { role: '신부', name: '최 혜령', phone: '010-4586-5811' },
+  { role: '신랑 아버지', name: '조 석영', phone: '010-4231-2146' },
+  { role: '신랑 어머니', name: '김 경화', phone: '010-4309-2146' },
+  { role: '신부 아버지', name: '최 태경', phone: '010-3261-5811' },
+  { role: '신부 어머니', name: '강 미선', phone: '010-2380-5689' },
 ]
 
 export const timeline = [
   {
-    date: '2014년 1월 16일',
-    title: 'CGV 아르바이트',
-    description: '같은 곳에서 함께 일하다\n서로에게 마음이 닿은 날',
+    date: '2016년 초',
+    title: '대학생 과외 선생님과 고3 학생',
+    description: '수학과..과학을...가르치던\n아기호랑이를 키워버린 날',
     emoji: '🎬',
   },
   {
-    date: '연애 기간 11년',
+    date: '2022년 06월 24일 ~ 25일 넘어가던 날',
     title: '함께 걸어온 시간',
     description: '오랜 시간 서로를 알아가며\n조금씩 닮아온 마음들',
     emoji: '🫶',
+    showRelationshipCounter: true,
   },
   {
     date: '프로포즈',
@@ -154,14 +157,10 @@ export const wedding = {
   address: '서울특별시 강남구 영동대로 506',
   lat: 37.5088,
   lng: 127.0632,
+  // lat/lng → LocationSection 지도 버튼 URL 자동 생성 (API 키 불필요)
   calendar: { year: 2026, month: 8, day: 15 },
   greeting:
     '저희 두 사람의 작은 만남이\n진실한 사랑으로 꽃피어\n오늘 이 자리를 빛내는 결혼식으로 이어졌습니다.\n\n평생 서로를 귀히 여기며\n처음의 설렘과 순수함을 잃지 않고\n존중하고 아껴 나가겠습니다.\n\n믿음과 사랑을 기초로 한 이 날에\n여러분의 따뜻한 축복이 함께 한다면\n더할 나위 없는 기쁨으로 간직하겠습니다.',
-  mapLinks: {
-    naver: 'https://map.naver.com/v5/search/노블발렌티%20삼성점',
-    tmap: 'https://tmap.co.kr',
-    kakao: 'https://map.kakao.com',
-  },
   mapImagePath: 'location/map-placeholder.jpg',
   transport: {
     shuttle: {
@@ -184,7 +183,7 @@ export const wedding = {
 }
 
 export const relationship = {
-  startDateISO: '2014-02-16T00:00:00+09:00',
+  startDateISO: '2022-06-25T00:00:00+09:00',
 }
 
 export const information = [
@@ -219,8 +218,6 @@ export const assets = {
   midPhoto: 'sections/middle.jpg',
   endingPhoto: 'sections/ending.jpg',
 }
-
-export const flowerDeliveryUrl = 'https://www.example.com/flower'
 
 export const share = {
   defaultMessage: '저희 결혼식에 초대합니다',

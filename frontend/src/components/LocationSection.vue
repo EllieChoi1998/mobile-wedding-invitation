@@ -6,27 +6,35 @@
       <h3 class="location__venue-name">{{ wedding.venue }}</h3>
       <p class="location__hall">{{ wedding.hall }}</p>
       <p class="location__address">{{ wedding.address }}</p>
-      <button type="button" class="btn-outline location__copy" @click="copyAddress">
-        {{ copied ? t.location.copied : t.location.copyAddress }}
-      </button>
     </div>
 
     <div class="location__map">
-      <ImageWithPlaceholder
-        :src="mapImage"
-        alt="venue map"
-        :placeholder-label="t.location.mapPlaceholder"
+      <VenueMap
+        :image-src="mapImage"
+        :lat="wedding.lat"
+        :lng="wedding.lng"
+        :naver-link="mapLinks.naver"
+        :title="wedding.venue"
+        :tap-hint="t.location.mapTapHint"
       />
     </div>
 
+    <button type="button" class="btn-outline location__copy" @click="copyAddress">
+      {{ copied ? t.location.copied : t.location.copyAddress }}
+    </button>
+
     <div class="location__links">
-      <a :href="wedding.mapLinks.naver" target="_blank" rel="noopener noreferrer" class="btn-outline">
+      <a :href="mapLinks.naver" target="_blank" rel="noopener noreferrer" class="btn-outline">
         {{ t.location.naverMap }}
       </a>
-      <a :href="wedding.mapLinks.tmap" target="_blank" rel="noopener noreferrer" class="btn-outline">
+      <a
+        :href="mapLinks.tmap"
+        class="btn-outline"
+        @click="openTmap"
+      >
         {{ t.location.tmap }}
       </a>
-      <a :href="wedding.mapLinks.kakao" target="_blank" rel="noopener noreferrer" class="btn-outline">
+      <a :href="mapLinks.kakaoRoute" target="_blank" rel="noopener noreferrer" class="btn-outline">
         {{ t.location.kakaoMap }}
       </a>
     </div>
@@ -53,7 +61,8 @@
 import { computed, ref } from 'vue'
 import { resolveAssetImage } from '../composables/useAssetImage'
 import { useInvitationContent } from '../composables/useInvitationContent'
-import ImageWithPlaceholder from './ImageWithPlaceholder.vue'
+import { buildMapLinks } from '../utils/mapLinks'
+import VenueMap from './VenueMap.vue'
 import SectionHeader from './SectionHeader.vue'
 
 const { wedding, t } = useInvitationContent()
@@ -61,6 +70,26 @@ const activeTab = ref('subway')
 const copied = ref(false)
 
 const mapImage = computed(() => resolveAssetImage(wedding.value.mapImagePath))
+
+const mapLinks = computed(() =>
+  buildMapLinks({
+    venue: wedding.value.venue,
+    address: wedding.value.address,
+    lat: wedding.value.lat,
+    lng: wedding.value.lng,
+  }),
+)
+
+function openTmap(event) {
+  event.preventDefault()
+  const { tmap, kakaoRoute } = mapLinks.value
+  window.location.href = tmap
+  window.setTimeout(() => {
+    if (document.visibilityState === 'visible') {
+      window.open(kakaoRoute, '_blank', 'noopener,noreferrer')
+    }
+  }, 1500)
+}
 
 const activeTransport = computed(() => wedding.value.transport[activeTab.value])
 
@@ -101,14 +130,25 @@ async function copyAddress() {
 }
 
 .location__copy {
-  margin-top: 0.75rem;
+  display: inline-block;
+  margin: 0 0 1rem;
 }
 
 .location__map {
-  aspect-ratio: 16 / 10;
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 62.5%;
   margin-bottom: 1rem;
   border-radius: 12px;
   overflow: hidden;
+  background: #e8e8e8;
+}
+
+.location__map :deep(.venue-map) {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
 }
 
 .location__links {

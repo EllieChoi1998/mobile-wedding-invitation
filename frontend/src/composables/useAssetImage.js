@@ -37,11 +37,18 @@ const optimizedMap = Object.fromEntries(
   }),
 )
 
+function findCaseInsensitive(map, key) {
+  if (!key || map[key] !== undefined) return map[key] ?? null
+  const lower = key.toLowerCase()
+  const matched = Object.keys(map).find((k) => k.toLowerCase() === lower)
+  return matched ? map[matched] : null
+}
+
 export function resolveAssetImage(relativePath) {
   if (!relativePath) return null
   const normalized = normalizePath(relativePath)
   const withoutExt = normalized.replace(/\.[^.]+$/, '')
-  return optimizedMap[withoutExt] ?? assetMap[normalized] ?? null
+  return findCaseInsensitive(optimizedMap, withoutExt) ?? findCaseInsensitive(assetMap, normalized)
 }
 
 export function useAssetImage(relativePath) {

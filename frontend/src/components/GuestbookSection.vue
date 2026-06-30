@@ -31,10 +31,6 @@
         <legend class="guestbook__label">{{ t.guestbook.sideLegend }}</legend>
         <div class="guestbook__options">
           <label class="guestbook__option">
-            <input v-model="gbSide" type="radio" name="gb-side" value="" />
-            <span>{{ t.guestbook.sideOptional }}</span>
-          </label>
-          <label class="guestbook__option">
             <input v-model="gbSide" type="radio" name="gb-side" value="groom" />
             <span>{{ t.side.groom }}</span>
           </label>

@@ -42,6 +42,7 @@ export default {
     eyebrow: 'Our Timeline',
     title: '우리의 이야기',
     desc: '처음 만난 순간부터 지금까지',
+    counterDayUnit: '일',
   },
   interview: {
     eyebrow: 'Interview',
@@ -58,10 +59,10 @@ export default {
     countdownFuture: '결혼식까지 {days}일 남았습니다.',
     date: '일시',
     venue: '장소',
-    days: 'DAYS',
-    hours: 'HOUR',
-    minutes: 'MIN',
-    seconds: 'SEC',
+    days: '일',
+    hours: '시',
+    minutes: '분',
+    seconds: '초',
   },
   location: {
     eyebrow: 'Location',
@@ -71,6 +72,7 @@ export default {
     naverMap: '네이버지도',
     tmap: '티맵',
     kakaoMap: '카카오맵',
+    mapTapHint: '네이버지도에서 보기',
     mapPlaceholder: 'assets/location/map-placeholder.jpg — 지도 캡처 이미지',
   },
   dPlusDay: {
@@ -100,8 +102,7 @@ export default {
     namePlaceholder: '이름을 입력해 주세요',
     message: '축하 메시지',
     messagePlaceholder: '따뜻한 축하의 말을 남겨주세요',
-    sideLegend: '어느 측 하객이신가요? (선택)',
-    sideOptional: '선택 안 함',
+    sideLegend: '어느 측 하객이신가요?',
     submit: '작성하기',
     submitting: '작성 중...',
     success: '방명록이 등록되었습니다. 감사합니다!',
@@ -114,8 +115,8 @@ export default {
   },
   account: {
     eyebrow: 'Account',
-    title: '마음 전하는 곳',
-    desc: '참석이 어려우신 분들을 위해 계좌번호를 안내해 드립니다.\n너그러운 마음으로 양해 부탁드립니다.',
+    title: '소중한 마음 전하는 곳',
+    desc: '부득이하게 참석이 어려우신 분들을 위해 감사한 마음으로 안내해 드립니다.\n축하해 주시는 모든 분들의 아름다운 마음을 깊이 기억하겠습니다.',
     groomTab: '신랑측',
     brideTab: '신부측',
     copy: '복사',
@@ -142,7 +143,7 @@ export default {
   rsvp: {
     eyebrow: 'Rsvp',
     title: '참석 의사 전달',
-    desc: '신랑, 신부에게 참석의사를 미리 전달할 수 있어요.',
+    desc: '보내주시는 귀한 걸음에 소홀함이 없도록 정성껏 준비하겠습니다',
     name: '성함',
     namePlaceholder: '이름을 입력해 주세요',
     sideLegend: '어느 측 하객이신가요?',
@@ -168,11 +169,6 @@ export default {
     uploadClosed: '결혼식 이후 업로드 가능합니다.',
     statusLoading: '업로드 가능 여부 확인 중…',
     uploadError: '업로드에 실패했습니다.',
-  },
-  flower: {
-    title: '축하 화환 보내기',
-    desc: '축하의 마음을 전해보세요.',
-    button: '화환 보내기',
   },
   ending: {
     title: '저희의 새로운 시작을\n함께 해주셔서 감사합니다.',

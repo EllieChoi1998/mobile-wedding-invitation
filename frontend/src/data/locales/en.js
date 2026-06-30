@@ -42,6 +42,7 @@ export default {
     eyebrow: 'Our Timeline',
     title: 'Our Story',
     desc: 'From the first moment until now',
+    counterDayUnit: 'd',
   },
   interview: {
     eyebrow: 'Interview',
@@ -71,6 +72,7 @@ export default {
     naverMap: 'Naver Map',
     tmap: 'T Map',
     kakaoMap: 'Kakao Map',
+    mapTapHint: 'Open in Naver Map',
     mapPlaceholder: 'assets/location/map-placeholder.jpg — map screenshot',
   },
   dPlusDay: {
@@ -100,8 +102,7 @@ export default {
     namePlaceholder: 'Enter your name',
     message: 'Message',
     messagePlaceholder: 'Leave a warm congratulatory message',
-    sideLegend: 'Which side? (optional)',
-    sideOptional: 'Skip',
+    sideLegend: 'Which side are you with?',
     submit: 'Submit',
     submitting: 'Submitting...',
     success: 'Thank you! Your message has been posted.',
@@ -168,11 +169,6 @@ export default {
     uploadClosed: 'Upload opens after the wedding.',
     statusLoading: 'Checking upload availability…',
     uploadError: 'Upload failed.',
-  },
-  flower: {
-    title: 'Send Flowers',
-    desc: 'Share your congratulations.',
-    button: 'Send flowers',
   },
   ending: {
     title: 'Thank you for being part\nof our new beginning.',

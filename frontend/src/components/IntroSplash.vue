@@ -99,18 +99,27 @@ onUnmounted(() => {
 }
 
 .intro-splash__image-wrap {
-  flex: 7;
+  flex: 0 0 82%;
   min-height: 0;
+  box-sizing: border-box;
+  padding: 0 var(--splash-side-gap, 5%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
   overflow: hidden;
   background: var(--color-accent);
+  /* 좌우 여백 (양쪽 각 5% → 사진 영역 90%) */
+  --splash-side-gap: 5%;
+  /* 인물이 너무 크면 92~97%로 낮춤 */
+  --splash-image-height: 100%;
 }
 
 .intro-splash__image {
   display: block;
   width: 100%;
-  height: 100%;
+  height: var(--splash-image-height);
   object-fit: cover;
-  object-position: center;
+  object-position: center bottom;
 }
 
 .intro-splash__image-placeholder {
@@ -120,14 +129,14 @@ onUnmounted(() => {
 }
 
 .intro-splash__text {
-  flex: 3;
+  flex: 1 1 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   gap: 0.35rem;
-  padding: 0.875rem 1.25rem 1.25rem;
+  padding: 0.625rem 1.25rem 0.875rem;
   background: #fff;
   text-align: center;
 }

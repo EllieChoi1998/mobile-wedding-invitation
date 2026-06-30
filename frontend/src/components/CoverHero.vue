@@ -43,7 +43,7 @@ const coverImage = computed(() => resolveAssetImage(coverData.imagePath))
 .cover-hero__image {
   width: 100%;
   aspect-ratio: 3 / 4;
-  max-height: 420px;
+  max-height: 210px;
 }
 
 .cover-hero__content {
