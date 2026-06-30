@@ -1,7 +1,12 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
+import { API_MISCONFIG_MESSAGE, getApiBaseUrl, parseJsonResponse, readApiErrorMessage } from './client.js'
 
 export async function fetchAdminData(password) {
-  const response = await fetch(`${API_BASE_URL}/admin/data`, {
+  const apiBaseUrl = getApiBaseUrl()
+  if (!apiBaseUrl) {
+    throw new Error(API_MISCONFIG_MESSAGE)
+  }
+
+  const response = await fetch(`${apiBaseUrl}/admin/data`, {
     headers: { 'X-Admin-Password': password },
   })
 
@@ -12,9 +17,9 @@ export async function fetchAdminData(password) {
     throw new Error('관리자 접근이 설정되지 않았습니다')
   }
   if (!response.ok) {
-    const errorBody = await response.text()
-    throw new Error(errorBody || `API error: ${response.status}`)
+    const message = await readApiErrorMessage(response, `API error: ${response.status}`)
+    throw new Error(message)
   }
 
-  return response.json()
+  return parseJsonResponse(response)
 }

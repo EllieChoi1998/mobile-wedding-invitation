@@ -8,6 +8,10 @@
     </header>
 
     <div v-if="!authenticated" class="admin__login">
+      <p v-if="!apiConfigured" class="admin__config-warn">
+        Vercel에 <code>VITE_API_BASE_URL</code>이 설정되지 않았습니다.
+        AWS CloudFormation Output의 <code>ApiEndpoint</code> 값을 넣고 Redeploy한 뒤 다시 시도하세요.
+      </p>
       <p class="admin__login-desc">비밀번호를 입력하세요</p>
       <form class="admin__login-form" @submit.prevent="login">
         <input
@@ -159,7 +163,9 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { fetchAdminData } from '../api/admin'
+import { isApiConfigured } from '../api/client'
 
+const apiConfigured = isApiConfigured()
 const STORAGE_KEY = 'adminPassword'
 
 const authenticated = ref(false)
@@ -327,6 +333,24 @@ onMounted(async () => {
   margin-top: 0.75rem;
   color: #c0392b;
   font-size: 0.9rem;
+}
+
+.admin__config-warn {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: #8a5a00;
+  background: #fff8e6;
+  border: 1px solid #f0d78c;
+  border-radius: 6px;
+}
+
+.admin__config-warn code {
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
 }
 
 .admin__status,

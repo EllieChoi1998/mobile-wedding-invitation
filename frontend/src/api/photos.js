@@ -1,15 +1,15 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
+import { getApiBaseUrl, parseJsonResponse, readApiErrorMessage } from './client.js'
 
 async function handleResponse(response) {
   if (!response.ok) {
-    const errorBody = await response.text()
-    throw new Error(errorBody || `API error: ${response.status}`)
+    const message = await readApiErrorMessage(response, `API error: ${response.status}`)
+    throw new Error(message)
   }
-  return response.json()
+  return parseJsonResponse(response)
 }
 
 export async function requestPresignedUrl({ side, fileName, contentType }) {
-  const response = await fetch(`${API_BASE_URL}/photos/presign`, {
+  const response = await fetch(`${getApiBaseUrl()}/photos/presign`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ side, fileName, contentType }),
@@ -29,6 +29,6 @@ export async function uploadToS3(uploadUrl, file, contentType) {
 }
 
 export async function listPhotos(side) {
-  const response = await fetch(`${API_BASE_URL}/photos?side=${encodeURIComponent(side)}`)
+  const response = await fetch(`${getApiBaseUrl()}/photos?side=${encodeURIComponent(side)}`)
   return handleResponse(response)
 }

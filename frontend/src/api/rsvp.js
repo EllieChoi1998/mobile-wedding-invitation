@@ -1,22 +1,15 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
+import { getApiBaseUrl, parseJsonResponse, readApiErrorMessage } from './client.js'
 
 async function handleResponse(response) {
   if (!response.ok) {
-    let message = `API error: ${response.status}`
-    try {
-      const body = await response.json()
-      message = body.message || message
-    } catch {
-      const text = await response.text()
-      if (text) message = text
-    }
+    const message = await readApiErrorMessage(response, `API error: ${response.status}`)
     throw new Error(message)
   }
-  return response.json()
+  return parseJsonResponse(response)
 }
 
 export async function submitRsvp({ guestName, side, attending }) {
-  const response = await fetch(`${API_BASE_URL}/rsvp`, {
+  const response = await fetch(`${getApiBaseUrl()}/rsvp`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ guestName, side, attending }),
