@@ -47,13 +47,30 @@ jobs:
         env:
           NODE_ENV: development
 
+      - name: Remove failed stack if needed
+        run: |
+          STATUS=$(aws cloudformation describe-stacks \
+            --stack-name mobile-wedding-invitation \
+            --query 'Stacks[0].StackStatus' \
+            --output text 2>/dev/null || echo "NOT_FOUND")
+          if [ "$STATUS" = "ROLLBACK_COMPLETE" ]; then
+            echo "Deleting stack in ROLLBACK_COMPLETE state..."
+            aws cloudformation delete-stack --stack-name mobile-wedding-invitation
+            aws cloudformation wait stack-delete-complete --stack-name mobile-wedding-invitation
+          fi
+
       - name: SAM deploy
-        run: >
-          sam deploy
-          --stack-name mobile-wedding-invitation
-          --resolve-s3
-          --region ${{ secrets.AWS_REGION }}
-          --capabilities CAPABILITY_IAM
-          --no-confirm-changeset
-          --no-fail-on-empty-changeset
-          --parameter-overrides AdminPassword=${{ secrets.ADMIN_PASSWORD }}
+        env:
+          FRONTEND_ORIGIN: ${{ secrets.FRONTEND_ORIGIN }}
+        run: |
+          if [ -z "$FRONTEND_ORIGIN" ]; then
+            FRONTEND_ORIGIN="http://localhost:5173"
+          fi
+          sam deploy \
+            --stack-name mobile-wedding-invitation \
+            --resolve-s3 \
+            --region ${{ secrets.AWS_REGION }} \
+            --capabilities CAPABILITY_IAM \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --parameter-overrides "AdminPassword=${{ secrets.ADMIN_PASSWORD }} FrontendOrigin=${FRONTEND_ORIGIN}"
