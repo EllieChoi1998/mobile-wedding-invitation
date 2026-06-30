@@ -7,21 +7,26 @@
     />
 
     <div class="guest-gallery__upload">
-      <label class="guest-gallery__upload-label btn-outline">
-        <input
-          type="file"
-          accept="image/*"
-          class="guest-gallery__file-input"
-          :disabled="uploading"
-          @change="onFileSelected"
-        />
-        {{ uploading ? t.guestGallery.uploading : t.guestGallery.select }}
-      </label>
-      <p v-if="uploadError" class="guest-gallery__message guest-gallery__message--error">{{ uploadError }}</p>
-      <p v-if="uploadSuccess" class="guest-gallery__message guest-gallery__message--success">
-        {{ t.guestGallery.uploadSuccess }}
-      </p>
-      <p class="guest-gallery__note">{{ t.guestGallery.uploadNote }}</p>
+      <template v-if="isUploadOpen">
+        <label class="guest-gallery__upload-label btn-outline">
+          <input
+            type="file"
+            accept="image/*"
+            class="guest-gallery__file-input"
+            :disabled="uploading"
+            @change="onFileSelected"
+          />
+          {{ uploading ? t.guestGallery.uploading : t.guestGallery.select }}
+        </label>
+        <p v-if="uploadError" class="guest-gallery__message guest-gallery__message--error">{{ uploadError }}</p>
+        <p v-if="uploadSuccess" class="guest-gallery__message guest-gallery__message--success">
+          {{ t.guestGallery.uploadSuccess }}
+        </p>
+        <p class="guest-gallery__note" :class="{ 'guest-gallery__note--test': isTestMode }">
+          {{ isTestMode ? t.guestGallery.uploadTestNote : t.guestGallery.uploadNote }}
+        </p>
+      </template>
+      <p v-else class="guest-gallery__closed">{{ t.guestGallery.uploadClosed }}</p>
     </div>
 
     <div v-if="loading" class="guest-gallery__status">{{ t.guestGallery.loading }}</div>
@@ -41,11 +46,13 @@
 import { ref, watch } from 'vue'
 import { useSide } from '../composables/useSide'
 import { useLocale } from '../composables/useLocale'
+import { useGuestPhotoUpload } from '../composables/useGuestPhotoUpload'
 import { listPhotos, requestPresignedUrl, uploadToS3 } from '../api/photos'
 import SectionHeader from './SectionHeader.vue'
 
 const { side } = useSide()
 const { t } = useLocale()
+const { isUploadOpen, isTestMode } = useGuestPhotoUpload()
 
 const photos = ref([])
 const loading = ref(false)
@@ -112,6 +119,21 @@ watch(side, fetchPhotos, { immediate: true })
   font-size: 0.75rem;
   color: var(--color-text-muted);
   text-align: center;
+}
+
+.guest-gallery__note--test {
+  color: var(--color-primary-dark);
+}
+
+.guest-gallery__closed {
+  margin: 0;
+  padding: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  text-align: center;
+  background: var(--color-accent, #fff0f3);
+  border-radius: 8px;
 }
 
 .guest-gallery__file-input {

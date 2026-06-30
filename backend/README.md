@@ -383,6 +383,7 @@ echo "Done."
 | `POST` | `/photos/presign` | 사진 업로드용 presigned URL |
 | `GET` | `/photos?side=groom\|bride` | 사진 목록 |
 | `GET` | `/admin/data` | 관리자 통합 조회 (비밀번호 필요) |
+| `POST` | `/admin/delete` | 관리자 항목 삭제 (비밀번호 필요, body: `resource`, `id`, `side`) |
 
 ---
 

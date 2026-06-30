@@ -65,6 +65,7 @@
                 <th>측</th>
                 <th>참석</th>
                 <th>제출 시각</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -80,6 +81,16 @@
                   </span>
                 </td>
                 <td>{{ formatDate(rsvp.createdAt) }}</td>
+                <td class="admin__actions">
+                  <button
+                    type="button"
+                    class="admin__delete"
+                    :disabled="isDeleting('rsvp', rsvp.rsvpId)"
+                    @click="confirmDelete('rsvp', rsvp.rsvpId, rsvp.side, rsvp.guestName)"
+                  >
+                    {{ isDeleting('rsvp', rsvp.rsvpId) ? '…' : '삭제' }}
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -97,6 +108,7 @@
                 <th>메시지</th>
                 <th>측</th>
                 <th>작성 시각</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -105,6 +117,16 @@
                 <td class="admin__message">{{ msg.message }}</td>
                 <td>{{ msg.side ? sideLabel(msg.side) : '-' }}</td>
                 <td>{{ formatDate(msg.createdAt) }}</td>
+                <td class="admin__actions">
+                  <button
+                    type="button"
+                    class="admin__delete"
+                    :disabled="isDeleting('guestbook', msg.messageId)"
+                    @click="confirmDelete('guestbook', msg.messageId, null, msg.authorName)"
+                  >
+                    {{ isDeleting('guestbook', msg.messageId) ? '…' : '삭제' }}
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -152,6 +174,14 @@
               >
                 원본 다운로드
               </a>
+              <button
+                type="button"
+                class="admin__delete admin__delete--photo"
+                :disabled="isDeleting('photo', photo.photoId)"
+                @click="confirmDelete('photo', photo.photoId, photoTab, photo.fileName)"
+              >
+                {{ isDeleting('photo', photo.photoId) ? '삭제 중…' : '삭제' }}
+              </button>
             </div>
           </li>
         </ul>
@@ -162,7 +192,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { fetchAdminData } from '../api/admin'
+import { fetchAdminData, deleteAdminItem } from '../api/admin'
 import { isApiConfigured } from '../api/client'
 
 const apiConfigured = isApiConfigured()
@@ -176,6 +206,7 @@ const loginError = ref('')
 const loadError = ref('')
 const data = ref(null)
 const photoTab = ref('groom')
+const deletingKey = ref('')
 
 const currentPhotos = computed(() => {
   if (!data.value) return []
@@ -197,8 +228,28 @@ function formatDate(iso) {
   })
 }
 
-async function loadData(password) {
-  loading.value = true
+function isDeleting(resource, id) {
+  return deletingKey.value === `${resource}:${id}`
+}
+
+async function confirmDelete(resource, id, side, label) {
+  const name = label || id
+  const ok = window.confirm(`"${name}" 항목을 삭제할까요?\n되돌릴 수 없습니다.`)
+  if (!ok) return
+
+  deletingKey.value = `${resource}:${id}`
+  try {
+    await deleteAdminItem(storedPassword.value, { resource, id, side })
+    await loadData(storedPassword.value, { silent: true })
+  } catch (err) {
+    window.alert(err.message || '삭제에 실패했습니다')
+  } finally {
+    deletingKey.value = ''
+  }
+}
+
+async function loadData(password, { silent = false } = {}) {
+  if (!silent) loading.value = true
   loadError.value = ''
   try {
     data.value = await fetchAdminData(password)
@@ -211,7 +262,7 @@ async function loadData(password) {
       loginError.value = err.message
     }
   } finally {
-    loading.value = false
+    if (!silent) loading.value = false
   }
 }
 
@@ -528,5 +579,36 @@ onMounted(async () => {
 
 .admin__download:hover {
   background: var(--color-accent, #fff0f3);
+}
+
+.admin__actions {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.admin__delete {
+  padding: 0.3rem 0.55rem;
+  font-size: 0.75rem;
+  color: #c0392b;
+  background: #fff;
+  border: 1px solid #e8b4b0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.admin__delete:hover:not(:disabled) {
+  background: #fdecea;
+}
+
+.admin__delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin__delete--photo {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.4rem;
 }
 </style>

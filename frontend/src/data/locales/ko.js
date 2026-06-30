@@ -163,6 +163,8 @@ export default {
     uploading: '업로드 중...',
     uploadSuccess: '사진이 업로드되었습니다!',
     uploadNote: '결혼식 당일부터 업로드 가능합니다.',
+    uploadTestNote: '지금은 테스트 기간입니다. 업로드 가능해요.',
+    uploadClosed: '결혼식 당일부터 사진을 업로드할 수 있습니다.',
     loading: '사진을 불러오는 중...',
     empty: '아직 업로드된 사진이 없습니다.',
     loadError: '사진을 불러오지 못했습니다.',

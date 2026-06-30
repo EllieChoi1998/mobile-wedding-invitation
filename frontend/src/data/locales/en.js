@@ -163,6 +163,8 @@ export default {
     uploading: 'Uploading...',
     uploadSuccess: 'Photo uploaded!',
     uploadNote: 'Upload available from the wedding day.',
+    uploadTestNote: 'Test period — uploads are open.',
+    uploadClosed: 'Photo upload opens on the wedding day.',
     loading: 'Loading photos...',
     empty: 'No photos uploaded yet.',
     loadError: 'Could not load photos.',
