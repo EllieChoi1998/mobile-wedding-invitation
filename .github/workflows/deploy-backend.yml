@@ -64,6 +64,8 @@ jobs:
           FRONTEND_ORIGIN: ${{ secrets.FRONTEND_ORIGIN }}
         run: |
           if [ -z "$FRONTEND_ORIGIN" ]; then
+            echo "::warning::FRONTEND_ORIGIN secret is not set. API CORS will allow http://localhost:5173 only."
+            echo "::warning::Add GitHub Secret FRONTEND_ORIGIN=https://your-app.vercel.app for Vercel (exact URL, no wildcards)."
             FRONTEND_ORIGIN="http://localhost:5173"
           fi
           sam deploy \

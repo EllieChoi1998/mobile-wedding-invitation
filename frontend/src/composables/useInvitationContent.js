@@ -14,6 +14,7 @@ import {
   wedding as weddingMeta,
   flowerDeliveryUrl,
   share,
+  creator,
   getInvitationBySide,
 } from '../data/invitation'
 import { useSide } from './useSide'
@@ -78,6 +79,7 @@ export function useInvitationContent() {
     cover,
     flowerDeliveryUrl,
     share,
+    creator,
     wedding,
     sideInfo,
     calendarLabel,

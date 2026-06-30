@@ -25,6 +25,23 @@
     </div>
 
     <p class="ending__copyright">© {{ year }} {{ couple.groom.fullName }} · {{ couple.bride.fullName }} {{ t.ending.copyright }}</p>
+
+    <div class="ending__credit" aria-label="Site credit">
+      <p class="ending__credit-line">
+        {{ t.ending.createdBy }}
+        <a
+          class="ending__credit-link"
+          :href="creator.profileUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+        >@{{ creator.handle }}</a>
+        <template v-if="creator.email">
+          ·
+          <a class="ending__credit-link" :href="`mailto:${creator.email}`">{{ creator.email }}</a>
+        </template>
+      </p>
+      <p v-if="builtOnLabel" class="ending__credit-date">{{ t.ending.builtOn }} {{ builtOnLabel }}</p>
+    </div>
   </footer>
 </template>
 
@@ -32,13 +49,25 @@
 import { computed, onMounted, ref } from 'vue'
 import { resolveAssetImage } from '../composables/useAssetImage'
 import { useInvitationContent } from '../composables/useInvitationContent'
+import { useLocale } from '../composables/useLocale'
 import ImageWithPlaceholder from './ImageWithPlaceholder.vue'
 
-const { couple, assets, share, t } = useInvitationContent()
+const { couple, assets, share, creator, t } = useInvitationContent()
+const { locale } = useLocale()
 
 const kakaoReady = ref(false)
 const copied = ref(false)
 const year = new Date().getFullYear()
+
+const builtOnLabel = computed(() => {
+  if (!creator.builtAt) return ''
+  const date = new Date(`${creator.builtAt}T12:00:00`)
+  if (Number.isNaN(date.getTime())) return creator.builtAt
+  if (locale.value === 'en') {
+    return date.toLocaleDateString('en', { year: 'numeric', month: 'long' })
+  }
+  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
+})
 
 const endingImage = computed(() => resolveAssetImage(assets.endingPhoto))
 
@@ -148,5 +177,35 @@ onMounted(loadKakaoSdk)
   margin: 0;
   font-size: 0.6875rem;
   color: var(--color-text-muted);
+}
+
+.ending__credit {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(244, 167, 185, 0.2);
+}
+
+.ending__credit-line,
+.ending__credit-date {
+  margin: 0;
+  font-size: 0.625rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  opacity: 0.85;
+}
+
+.ending__credit-date {
+  margin-top: 0.25rem;
+}
+
+.ending__credit-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(136, 136, 136, 0.35);
+}
+
+.ending__credit-link:hover {
+  color: var(--color-primary-dark);
+  border-bottom-color: var(--color-primary-dark);
 }
 </style>

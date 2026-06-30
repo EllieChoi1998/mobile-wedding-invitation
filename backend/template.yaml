@@ -83,7 +83,6 @@ Resources:
           - X-Admin-Password
         AllowOrigins:
           - !Ref FrontendOrigin
-          - 'https://*.vercel.app'
 
   PresignFunction:
     Type: AWS::Serverless::Function

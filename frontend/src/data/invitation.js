@@ -226,6 +226,14 @@ export const share = {
   defaultMessage: '저희 결혼식에 초대합니다',
 }
 
+/** 청첩장 제작자 크레딧 — 하단 표시용 (email은 본인 주소로 수정) */
+export const creator = {
+  handle: 'EllieChoi1998',
+  profileUrl: 'https://github.com/EllieChoi1998',
+  email: '',
+  builtAt: '2026-06-22',
+}
+
 export const invitationData = {
   groom: {
     side: 'groom',

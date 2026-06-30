@@ -65,6 +65,7 @@ ap-northeast-2
 리전
 ADMIN_PASSWORD
 예: 100498
+FRONTEND_ORIGIN = https://mobile-wedding-invitation.vercel.app
 관리자 페이지 비밀번호
 ADMIN_PASSWORD는 백엔드 AdminPassword 파라미터로 들어가며, 관리자 API X-Admin-Password 헤더와 일치해야 합니다.Part 1. 백엔드 설정 (AWS + GitHub)
 1단계: AWS 계정 준비

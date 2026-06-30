@@ -180,6 +180,8 @@ export default {
     copied: 'Link copied!',
     endingPhotoHint: 'assets/sections/ending.jpg — closing photo',
     copyright: 'All rights reserved',
+    createdBy: 'Created by',
+    builtOn: 'Built',
   },
   sectionPhoto: {
     midHint: 'assets/sections/middle.jpg — divider photo',

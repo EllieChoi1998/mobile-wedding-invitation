@@ -180,6 +180,8 @@ export default {
     copied: '링크가 복사되었습니다!',
     endingPhotoHint: 'assets/sections/ending.jpg — 마무리 사진',
     copyright: 'All rights reserved',
+    createdBy: '제작',
+    builtOn: '제작일',
   },
   sectionPhoto: {
     midHint: 'assets/sections/middle.jpg — 구분용 풀샷 사진',
