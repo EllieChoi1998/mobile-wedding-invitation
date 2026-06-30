@@ -29,12 +29,12 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useInvitationContent } from '../composables/useInvitationContent'
 
-const splashModules = import.meta.glob('../assets/splash/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}', {
+const optimizedSplashModules = import.meta.glob('../assets/.optimized/splash/*.{webp,WEBP}', {
   eager: true,
   import: 'default',
 })
 
-const splashImage = Object.values(splashModules)[0] ?? null
+const splashImage = Object.values(optimizedSplashModules)[0] ?? null
 
 const { couple, wedding } = useInvitationContent()
 

@@ -1,19 +1,34 @@
 import { computed } from 'vue'
 
-const photoModules = import.meta.glob('../assets/wedding-photos/*.{jpg,jpeg,png,webp,gif,JPG,JPEG,PNG,WEBP,GIF}', {
+const thumbModules = import.meta.glob('../assets/wedding-photos/optimized/*-thumb.webp', {
   eager: true,
   import: 'default',
 })
 
+const fullModules = import.meta.glob('../assets/wedding-photos/optimized/*-full.webp', {
+  eager: true,
+  import: 'default',
+})
+
+function baseNameFromPath(path, suffix) {
+  const file = path.split('/').pop()
+  return file.replace(new RegExp(`${suffix}\\.webp$`), '')
+}
+
 export function useWeddingPhotos() {
-  const photos = computed(() =>
-    Object.entries(photoModules)
-      .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
-      .map(([path, url]) => ({
-        url,
-        name: path.split('/').pop(),
-      })),
-  )
+  const photos = computed(() => {
+    const entries = Object.entries(fullModules).map(([path, fullUrl]) => {
+      const base = baseNameFromPath(path, '-full')
+      const thumbPath = Object.keys(thumbModules).find((p) => baseNameFromPath(p, '-thumb') === base)
+      return {
+        name: `${base}.webp`,
+        thumbUrl: thumbPath ? thumbModules[thumbPath] : fullUrl,
+        fullUrl,
+      }
+    })
+
+    return entries.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+  })
 
   return { photos }
 }

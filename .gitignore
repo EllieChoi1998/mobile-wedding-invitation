@@ -29,3 +29,7 @@ Thumbs.db
 
 # SAM config (may contain account-specific values)
 samconfig.toml
+
+# Generated at build time (Vercel prebuild) — do not commit
+frontend/src/assets/wedding-photos/optimized/
+frontend/src/assets/.optimized/

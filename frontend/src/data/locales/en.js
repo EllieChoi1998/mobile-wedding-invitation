@@ -82,11 +82,12 @@ export default {
     eyebrow: 'Gallery',
     title: 'Gallery',
     empty: 'Photos coming soon',
-    emptyHint: 'Add images to assets/wedding-photos/',
+    emptyHint: 'Add images to assets/wedding-photos/ and deploy — they are optimized automatically.',
     showMore: 'Show more',
     close: 'Close',
     prev: 'Previous',
     next: 'Next',
+    openPhoto: 'View photo',
   },
   information: {
     eyebrow: 'Information',

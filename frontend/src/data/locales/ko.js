@@ -82,11 +82,12 @@ export default {
     eyebrow: 'Gallery',
     title: '갤러리',
     empty: '사진을 추가해 주세요',
-    emptyHint: 'assets/wedding-photos/ 폴더에 이미지를 넣으면 표시됩니다.',
+    emptyHint: 'assets/wedding-photos/ 폴더에 이미지를 추가한 뒤 배포하면 자동으로 표시됩니다.',
     showMore: '더보기',
     close: '닫기',
     prev: '이전 사진',
     next: '다음 사진',
+    openPhoto: '사진 크게 보기',
   },
   information: {
     eyebrow: 'Information',

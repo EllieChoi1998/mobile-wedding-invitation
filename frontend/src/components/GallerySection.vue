@@ -10,31 +10,48 @@
       </div>
     </div>
 
-    <div v-else class="gallery__grid">
+    <div v-else class="gallery__album">
       <button
-        v-for="(photo, index) in visiblePhotos"
-        :key="photo.name"
         type="button"
-        class="gallery__item"
-        :class="{ 'gallery__item--featured': index === 0 && !showAll }"
-        @click="openLightbox(photo)"
+        class="gallery__cover"
+        :aria-label="t.gallery.openPhoto"
+        @click="openLightbox(selectedIndex)"
       >
-        <img :src="photo.url" :alt="photo.name" class="gallery__image" loading="lazy" />
+        <img
+          :src="photos[selectedIndex].thumbUrl"
+          :alt="photos[selectedIndex].name"
+          class="gallery__cover-image"
+          loading="lazy"
+        />
+        <span class="gallery__cover-hint">{{ selectedIndex + 1 }} / {{ photos.length }}</span>
       </button>
+
+      <div ref="stripRef" class="gallery__strip" role="list">
+        <button
+          v-for="(photo, index) in photos"
+          :key="photo.name"
+          type="button"
+          role="listitem"
+          class="gallery__thumb"
+          :class="{ 'gallery__thumb--active': index === selectedIndex }"
+          :aria-label="`${index + 1} / ${photos.length}`"
+          :aria-current="index === selectedIndex ? 'true' : undefined"
+          @click="openLightbox(index)"
+        >
+          <img :src="photo.thumbUrl" :alt="photo.name" class="gallery__thumb-image" loading="lazy" />
+        </button>
+      </div>
     </div>
 
-    <button
-      v-if="photos.length > initialCount"
-      type="button"
-      class="btn-text gallery__more"
-      @click="showAll = !showAll"
-    >
-      {{ showAll ? t.interview.showLess : t.gallery.showMore }}
-    </button>
-
     <Teleport to="body">
-      <div v-if="lightboxIndex !== null" class="lightbox" @click.self="closeLightbox">
+      <div
+        v-if="lightboxIndex !== null"
+        class="lightbox"
+        @click.self="closeLightbox"
+        @touchmove.passive="false"
+      >
         <button type="button" class="lightbox__close" :aria-label="t.gallery.close" @click="closeLightbox">✕</button>
+
         <button
           v-if="photos.length > 1"
           type="button"
@@ -42,7 +59,23 @@
           :aria-label="t.gallery.prev"
           @click.stop="prevPhoto"
         >‹</button>
-        <img :src="photos[lightboxIndex].url" :alt="photos[lightboxIndex].name" class="lightbox__image" />
+
+        <div
+          class="lightbox__stage"
+          @touchstart.passive="onLightboxTouchStart"
+          @touchmove="onLightboxTouchMove"
+          @touchend.passive="onLightboxTouchEnd"
+        >
+          <img
+            :key="lightboxIndex"
+            :src="photos[lightboxIndex].fullUrl"
+            :alt="photos[lightboxIndex].name"
+            class="lightbox__image"
+            :style="transformStyle"
+            draggable="false"
+          />
+        </div>
+
         <button
           v-if="photos.length > 1"
           type="button"
@@ -50,6 +83,7 @@
           :aria-label="t.gallery.next"
           @click.stop="nextPhoto"
         >›</button>
+
         <p class="lightbox__counter">{{ lightboxIndex + 1 }} / {{ photos.length }}</p>
       </div>
     </Teleport>
@@ -57,41 +91,108 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useWeddingPhotos } from '../composables/useWeddingPhotos'
 import { useInvitationContent } from '../composables/useInvitationContent'
+import { usePinchZoom } from '../composables/usePinchZoom'
 import SectionHeader from './SectionHeader.vue'
 
 const { photos } = useWeddingPhotos()
 const { t } = useInvitationContent()
 
-const initialCount = 6
-const showAll = ref(false)
+const selectedIndex = ref(0)
 const lightboxIndex = ref(null)
+const stripRef = ref(null)
 
-const visiblePhotos = computed(() =>
-  showAll.value ? photos.value : photos.value.slice(0, initialCount),
-)
+const {
+  isZoomed,
+  transformStyle,
+  resetZoom,
+  onTouchStart,
+  onTouchMove,
+  onTouchEnd,
+} = usePinchZoom()
 
-function openLightbox(photo) {
-  const index = photos.value.findIndex((p) => p.name === photo.name)
-  lightboxIndex.value = index >= 0 ? index : 0
+let swipeStartX = 0
+let swipeStartY = 0
+let swipeTracking = false
+
+function scrollThumbIntoView(index) {
+  nextTick(() => {
+    const strip = stripRef.value
+    if (!strip) return
+    const thumb = strip.children[index]
+    thumb?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+  })
+}
+
+function selectPhoto(index) {
+  selectedIndex.value = index
+  scrollThumbIntoView(index)
+}
+
+function openLightbox(index) {
+  lightboxIndex.value = index
+  selectedIndex.value = index
   document.body.style.overflow = 'hidden'
+  scrollThumbIntoView(index)
 }
 
 function closeLightbox() {
   lightboxIndex.value = null
+  resetZoom()
   document.body.style.overflow = ''
 }
 
 function prevPhoto() {
   if (lightboxIndex.value === null) return
-  lightboxIndex.value = (lightboxIndex.value - 1 + photos.value.length) % photos.value.length
+  resetZoom()
+  const next = (lightboxIndex.value - 1 + photos.value.length) % photos.value.length
+  lightboxIndex.value = next
+  selectedIndex.value = next
+  scrollThumbIntoView(next)
 }
 
 function nextPhoto() {
   if (lightboxIndex.value === null) return
-  lightboxIndex.value = (lightboxIndex.value + 1) % photos.value.length
+  resetZoom()
+  const next = (lightboxIndex.value + 1) % photos.value.length
+  lightboxIndex.value = next
+  selectedIndex.value = next
+  scrollThumbIntoView(next)
+}
+
+function onLightboxTouchStart(event) {
+  onTouchStart(event)
+  if (event.touches.length === 1 && !isZoomed.value) {
+    swipeStartX = event.touches[0].clientX
+    swipeStartY = event.touches[0].clientY
+    swipeTracking = true
+  } else {
+    swipeTracking = false
+  }
+}
+
+function onLightboxTouchMove(event) {
+  onTouchMove(event)
+  if (swipeTracking && event.touches.length === 1 && !isZoomed.value) {
+    const dx = Math.abs(event.touches[0].clientX - swipeStartX)
+    const dy = Math.abs(event.touches[0].clientY - swipeStartY)
+    if (dx > dy && dx > 10) event.preventDefault()
+  }
+}
+
+function onLightboxTouchEnd(event) {
+  onTouchEnd(event)
+  if (swipeTracking && !isZoomed.value && event.changedTouches.length === 1) {
+    const dx = event.changedTouches[0].clientX - swipeStartX
+    const dy = event.changedTouches[0].clientY - swipeStartY
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) nextPhoto()
+      else prevPhoto()
+    }
+  }
+  swipeTracking = false
 }
 
 function onKeydown(event) {
@@ -100,6 +201,10 @@ function onKeydown(event) {
   if (event.key === 'ArrowLeft') prevPhoto()
   if (event.key === 'ArrowRight') nextPhoto()
 }
+
+watch(lightboxIndex, (index) => {
+  if (index !== null) resetZoom()
+})
 
 onMounted(() => window.addEventListener('keydown', onKeydown))
 onUnmounted(() => {
@@ -114,44 +219,90 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.gallery__grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
+.gallery__album {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-.gallery__item {
+.gallery__cover {
+  position: relative;
   margin: 0;
   padding: 0;
   border: none;
   overflow: hidden;
-  border-radius: 10px;
-  aspect-ratio: 1;
+  border-radius: 12px;
+  aspect-ratio: 4 / 3;
   cursor: pointer;
   background: #fff;
-  box-shadow: 0 2px 10px rgba(244, 167, 185, 0.15);
+  box-shadow: 0 4px 20px rgba(244, 167, 185, 0.2);
   transition: transform 0.2s;
 }
 
-.gallery__item:active {
-  transform: scale(0.98);
+.gallery__cover:active {
+  transform: scale(0.99);
 }
 
-.gallery__item--featured {
-  grid-column: span 2;
-  aspect-ratio: 4 / 3;
-}
-
-.gallery__image {
+.gallery__cover-image {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.gallery__more {
+.gallery__cover-hint {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.gallery__strip {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.125rem 0.5rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.gallery__strip::-webkit-scrollbar {
+  display: none;
+}
+
+.gallery__thumb {
+  flex: 0 0 auto;
+  width: 4.5rem;
+  height: 4.5rem;
+  margin: 0;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #fff;
+  scroll-snap-align: center;
+  transition: border-color 0.2s, transform 0.2s, opacity 0.2s;
+  opacity: 0.7;
+}
+
+.gallery__thumb--active {
+  border-color: var(--color-primary, #f4a7b9);
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+.gallery__thumb-image {
   display: block;
-  margin: 1.5rem auto 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .lightbox {
@@ -161,8 +312,19 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1rem;
-  background: rgba(0, 0, 0, 0.88);
+  padding: 3rem 0.5rem;
+  background: rgba(0, 0, 0, 0.92);
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+.lightbox__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .lightbox__image {
@@ -170,12 +332,16 @@ onUnmounted(() => {
   max-height: 100%;
   object-fit: contain;
   border-radius: 4px;
+  transform-origin: center center;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .lightbox__close {
   position: absolute;
   top: 1rem;
   right: 1rem;
+  z-index: 2;
   width: 2.5rem;
   height: 2.5rem;
   border: none;
@@ -189,9 +355,10 @@ onUnmounted(() => {
 .lightbox__nav {
   position: absolute;
   top: 50%;
+  z-index: 2;
   transform: translateY(-50%);
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: none;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.15);
@@ -201,8 +368,8 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.lightbox__nav--prev { left: 0.75rem; }
-.lightbox__nav--next { right: 0.75rem; }
+.lightbox__nav--prev { left: 0.5rem; }
+.lightbox__nav--next { right: 0.5rem; }
 
 .lightbox__counter {
   position: absolute;
