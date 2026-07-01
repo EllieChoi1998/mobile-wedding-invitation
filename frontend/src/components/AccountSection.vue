@@ -1,5 +1,5 @@
 <template>
-  <section class="account section section--white">
+  <section class="account section section--accent">
     <SectionHeader
       :eyebrow="t.account.eyebrow"
       :title="t.account.title"
@@ -85,7 +85,7 @@ async function copyAccount(item, index) {
   padding: 0.75rem;
   border: 1.5px solid rgba(244, 167, 185, 0.35);
   border-radius: 10px;
-  background: var(--color-accent);
+  background: #fff;
   font-size: 0.8125rem;
   color: var(--color-text-muted);
   cursor: pointer;
@@ -94,7 +94,7 @@ async function copyAccount(item, index) {
 
 .account__tab--active {
   border-color: var(--color-primary);
-  background: #fff;
+  background: var(--color-accent);
   color: var(--color-primary-dark);
   font-weight: 500;
 }
@@ -115,7 +115,7 @@ async function copyAccount(item, index) {
   gap: 0.75rem;
   padding: 1rem 1.125rem;
   border-radius: 12px;
-  background: var(--color-accent);
+  background: #fff;
 }
 
 .account__info {

@@ -7,8 +7,8 @@
     <GallerySection />
     <AccountSection />
     <InformationSection />
-    <AboutUs />
-    <OurTimeline />
+    <!-- <AboutUs /> -->
+    <!-- <OurTimeline /> -->
     <GuestbookSection />
     <GuestGallery />
     <RsvpForm />
@@ -23,8 +23,8 @@
 import { inject, ref, watch } from 'vue'
 import SideToolbar from '../components/SideToolbar.vue'
 import CoverHero from '../components/CoverHero.vue'
-import AboutUs from '../components/AboutUs.vue'
-import OurTimeline from '../components/OurTimeline.vue'
+// import AboutUs from '../components/AboutUs.vue'
+// import OurTimeline from '../components/OurTimeline.vue'
 import WeddingDay from '../components/WeddingDay.vue'
 import LocationSection from '../components/LocationSection.vue'
 import GallerySection from '../components/GallerySection.vue'

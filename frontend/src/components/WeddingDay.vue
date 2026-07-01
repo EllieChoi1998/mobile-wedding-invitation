@@ -5,7 +5,7 @@
     <dl class="wedding-day__info">
       <div class="wedding-day__info-row">
         <dt>{{ t.weddingDay.date }}</dt>
-        <dd>{{ wedding.date }} ({{ wedding.dayNote }})<br />{{ wedding.time }}</dd>
+        <dd>{{ wedding.date }} {{ wedding.dayNote }}<br />{{ wedding.time }}</dd>
       </div>
       <div class="wedding-day__info-row">
         <dt>{{ t.weddingDay.venue }}</dt>
@@ -13,6 +13,7 @@
       </div>
     </dl>
 
+    <!--
     <div class="countdown">
       <div class="countdown__item hanji-card">
         <span class="countdown__value">{{ pad(countdown.days) }}</span>
@@ -35,6 +36,7 @@
     <p class="wedding-day__countdown-msg">
       {{ countdownMessage }}
     </p>
+    -->
 
     <div class="wedding-calendar hanji-card">
       <p class="wedding-calendar__month">{{ calendarLabel }}</p>
@@ -67,24 +69,25 @@
 
 <script setup>
 import { computed } from 'vue'
-import { wedding as weddingMeta } from '../data/invitation'
-import { useCountdown } from '../composables/useCountdown'
 import { useInvitationContent } from '../composables/useInvitationContent'
 import SectionHeader from './SectionHeader.vue'
 
 const { wedding, calendarLabel, weekdays, t } = useInvitationContent()
-const countdown = useCountdown(weddingMeta.dateISO)
 
-function pad(n) {
-  return String(n).padStart(2, '0')
-}
-
-const countdownMessage = computed(() => {
-  const template = countdown.value.isPast
-    ? t.value.weddingDay.countdownPast
-    : t.value.weddingDay.countdownFuture
-  return template.replace('{days}', countdown.value.days)
-})
+// import { wedding as weddingMeta } from '../data/invitation'
+// import { useCountdown } from '../composables/useCountdown'
+// const countdown = useCountdown(weddingMeta.dateISO)
+//
+// function pad(n) {
+//   return String(n).padStart(2, '0')
+// }
+//
+// const countdownMessage = computed(() => {
+//   const template = countdown.value.isPast
+//     ? t.value.weddingDay.countdownPast
+//     : t.value.weddingDay.countdownFuture
+//   return template.replace('{days}', countdown.value.days)
+// })
 
 const calendarCells = computed(() => {
   const { year, month } = wedding.value.calendar
@@ -103,19 +106,13 @@ const calendarCells = computed(() => {
   text-align: center;
 }
 
-.wedding-day__countdown-msg {
-  margin: 0 0 1.5rem;
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
-}
-
 .wedding-day__info {
   margin: 0 0 1.5rem;
   text-align: center;
 }
 
 .wedding-calendar {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
   padding: 1.25rem 1rem;
   border-radius: 16px;
   background: var(--color-accent);

@@ -1,5 +1,6 @@
 <template>
-  <footer class="ending section section--accent">
+  <footer class="ending section section--white">
+    <!--
     <div class="ending__photo">
       <ImageWithPlaceholder
         :src="endingImage"
@@ -7,6 +8,7 @@
         :placeholder-label="t.ending.endingPhotoHint"
       />
     </div>
+    -->
 
     <p class="ending__message">{{ t.ending.title }}</p>
     <p class="ending__names">
@@ -47,12 +49,12 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { resolveAssetImage } from '../composables/useAssetImage'
+// import { resolveAssetImage } from '../composables/useAssetImage'
 import { useInvitationContent } from '../composables/useInvitationContent'
 import { useLocale } from '../composables/useLocale'
-import ImageWithPlaceholder from './ImageWithPlaceholder.vue'
+// import ImageWithPlaceholder from './ImageWithPlaceholder.vue'
 
-const { couple, assets, share, creator, t } = useInvitationContent()
+const { couple, share, creator, t } = useInvitationContent()
 const { locale } = useLocale()
 
 const kakaoReady = ref(false)
@@ -69,7 +71,7 @@ const builtOnLabel = computed(() => {
   return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
 })
 
-const endingImage = computed(() => resolveAssetImage(assets.endingPhoto))
+// const endingImage = computed(() => resolveAssetImage(assets.endingPhoto))
 
 function loadKakaoSdk() {
   const key = import.meta.env.VITE_KAKAO_JS_KEY

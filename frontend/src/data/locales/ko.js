@@ -109,6 +109,7 @@ export default {
   information: {
     eyebrow: 'Information',
     title: '안내사항',
+    flowerNotice: '축하 화환은 정중히 사양합니다.\n마음만 감사히 받겠습니다.',
   },
   guestbook: {
     eyebrow: 'Guestbook',

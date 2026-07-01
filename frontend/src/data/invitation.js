@@ -153,7 +153,7 @@ export const wedding = {
   time: '오전 11시',
   dateISO: '2026-08-15T11:00:00+09:00',
   venue: '노블발렌티 삼성점',
-  hall: '2F, 그랜드홀',
+  hall: '5층, 웨딩홀',
   address: '서울특별시 강남구 영동대로 506',
   lat: 37.5088,
   lng: 127.0632,
@@ -185,21 +185,6 @@ export const wedding = {
 export const relationship = {
   startDateISO: '2022-06-25T00:00:00+09:00',
 }
-
-export const information = [
-  {
-    title: '포토존',
-    body: '예식장 로비에 포토존이 마련되어 있습니다.\n기념 사진을 남겨주세요.',
-  },
-  {
-    title: '식사 안내',
-    body: '예식 후 같은 층 뷔페에서 식사가 준비되어 있습니다.',
-  },
-  {
-    title: '화환 안내',
-    body: '축하 화환은 정중히 사양합니다.\n마음만 감사히 받겠습니다.',
-  },
-]
 
 export const accounts = {
   groomSide: [

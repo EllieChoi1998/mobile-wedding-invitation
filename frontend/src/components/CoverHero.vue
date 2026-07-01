@@ -1,5 +1,5 @@
 <template>
-  <header class="cover-hero section section--hero">
+  <header class="cover-hero section section--accent">
     <CoverSplashBlock variant="section" />
 
     <div class="cover-hero__content">
@@ -28,6 +28,8 @@ const contactOpen = ref(false)
 .cover-hero {
   padding-left: 0;
   padding-right: 0;
+  padding-top: 0;
+  padding-bottom: 2.5rem;
 }
 
 .cover-hero__content {

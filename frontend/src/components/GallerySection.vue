@@ -1,5 +1,5 @@
 <template>
-  <section class="gallery section section--accent">
+  <section class="gallery section section--white">
     <SectionHeader :eyebrow="t.gallery.eyebrow" :title="t.gallery.title" />
 
     <div v-if="photos.length === 0" class="gallery__empty">

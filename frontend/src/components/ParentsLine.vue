@@ -42,7 +42,7 @@ const { couple, parentsLine, t } = useInvitationContent()
 .parents-line__row {
   width: 72%;
   padding: 0.75rem 1rem;
-  background: var(--color-accent);
+  background: #fff;
   box-shadow: 0 2px 12px rgba(var(--color-primary-rgb), 0.12);
 }
 

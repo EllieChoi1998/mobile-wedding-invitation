@@ -109,6 +109,7 @@ export default {
   information: {
     eyebrow: 'Information',
     title: 'Notice',
+    flowerNotice: 'We kindly ask that floral wreaths not be sent.\nYour warm wishes mean the world to us.',
   },
   guestbook: {
     eyebrow: 'Guestbook',

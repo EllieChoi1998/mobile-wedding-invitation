@@ -2,48 +2,36 @@
   <section class="information section section--white">
     <SectionHeader :eyebrow="t.information.eyebrow" :title="t.information.title" />
 
-    <div class="information__list">
-      <article v-for="(item, index) in information" :key="index" class="information__item hanji-card">
-        <h3 class="information__item-title">{{ item.title }}</h3>
-        <p class="information__item-body">{{ item.body }}</p>
-      </article>
+    <div class="information__notice hanji-card">
+      <p class="information__notice-text">{{ t.information.flowerNotice }}</p>
     </div>
   </section>
 </template>
 
 <script setup>
-import { useInvitationContent } from '../composables/useInvitationContent'
+import { useLocale } from '../composables/useLocale'
 import SectionHeader from './SectionHeader.vue'
 
-const { information, t } = useInvitationContent()
+const { t } = useLocale()
 </script>
 
 <style scoped>
-.information__list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.information__item {
-  padding: 1.125rem 1.25rem;
+.information__notice {
+  max-width: 17.5rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.375rem;
   background: var(--color-accent);
   text-align: center;
 }
 
-.information__item-title {
-  margin: 0 0 0.5rem;
-  font-family: var(--font-serif);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #333;
-}
-
-.information__item-body {
+.information__notice-text {
   margin: 0;
-  font-size: 0.8125rem;
-  line-height: 1.7;
+  font-family: var(--font-serif);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 2;
   white-space: pre-line;
-  color: var(--color-text-muted);
+  color: var(--color-text);
+  letter-spacing: 0.01em;
 }
 </style>
