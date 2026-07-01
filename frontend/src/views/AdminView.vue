@@ -104,13 +104,30 @@
       </section>
 
       <section class="admin__section">
-        <h2 class="admin__section-title">RSVP 목록</h2>
+        <div class="admin__section-head">
+          <h2 class="admin__section-title">RSVP 목록</h2>
+          <div v-if="deleteMode && data.rsvps.length > 0" class="admin__section-actions">
+            <button type="button" class="admin__bulk-btn" @click="selectAllRsvps">
+              전체 선택
+            </button>
+            <button type="button" class="admin__bulk-btn" @click="deselectAllRsvps">
+              선택 해제
+            </button>
+          </div>
+        </div>
         <div v-if="data.rsvps.length === 0" class="admin__empty">등록된 RSVP가 없습니다</div>
         <div v-else class="admin__table-wrap">
           <table class="admin__table">
             <thead>
               <tr>
-                <th v-if="deleteMode" class="admin__check-col"></th>
+                <th v-if="deleteMode" class="admin__check-col">
+                  <input
+                    type="checkbox"
+                    :checked="allRsvpsSelected"
+                    aria-label="RSVP 전체 선택"
+                    @change="toggleAllRsvps"
+                  />
+                </th>
                 <th>이름</th>
                 <th>측</th>
                 <th>참석</th>
@@ -149,13 +166,30 @@
       </section>
 
       <section class="admin__section">
-        <h2 class="admin__section-title">방명록</h2>
+        <div class="admin__section-head">
+          <h2 class="admin__section-title">방명록</h2>
+          <div v-if="deleteMode && data.guestbook.length > 0" class="admin__section-actions">
+            <button type="button" class="admin__bulk-btn" @click="selectAllGuestbook">
+              전체 선택
+            </button>
+            <button type="button" class="admin__bulk-btn" @click="deselectAllGuestbook">
+              선택 해제
+            </button>
+          </div>
+        </div>
         <div v-if="data.guestbook.length === 0" class="admin__empty">등록된 방명록이 없습니다</div>
         <div v-else class="admin__table-wrap">
           <table class="admin__table">
             <thead>
               <tr>
-                <th v-if="deleteMode" class="admin__check-col"></th>
+                <th v-if="deleteMode" class="admin__check-col">
+                  <input
+                    type="checkbox"
+                    :checked="allGuestbookSelected"
+                    aria-label="방명록 전체 선택"
+                    @change="toggleAllGuestbook"
+                  />
+                </th>
                 <th>작성자</th>
                 <th>메시지</th>
                 <th>측</th>
@@ -187,7 +221,44 @@
       </section>
 
       <section class="admin__section">
-        <h2 class="admin__section-title">사진</h2>
+        <div class="admin__section-head">
+          <h2 class="admin__section-title">사진</h2>
+          <div v-if="!deleteMode && currentPhotos.length > 0" class="admin__section-actions">
+            <button type="button" class="admin__bulk-btn" @click="selectAllCurrentTabPhotosForDownload">
+              탭 전체 선택
+            </button>
+            <button type="button" class="admin__bulk-btn" @click="selectAllPhotosForDownload">
+              전체 선택
+            </button>
+            <button
+              type="button"
+              class="admin__bulk-btn"
+              :disabled="photoDownloadCount === 0"
+              @click="clearPhotoDownloadSelection"
+            >
+              선택 해제
+            </button>
+            <button
+              type="button"
+              class="admin__bulk-btn admin__bulk-btn--primary"
+              :disabled="photoDownloadCount === 0 || photoDownloading"
+              @click="downloadSelectedPhotos"
+            >
+              {{ photoDownloading ? '다운로드 중…' : `선택 다운로드 (${photoDownloadCount})` }}
+            </button>
+          </div>
+          <div v-else-if="deleteMode && currentPhotos.length > 0" class="admin__section-actions">
+            <button type="button" class="admin__bulk-btn" @click="selectAllCurrentTabPhotosForDelete">
+              탭 전체 선택
+            </button>
+            <button type="button" class="admin__bulk-btn" @click="selectAllPhotosForDelete">
+              전체 선택
+            </button>
+            <button type="button" class="admin__bulk-btn" @click="deselectAllCurrentTabPhotosForDelete">
+              선택 해제
+            </button>
+          </div>
+        </div>
         <div class="admin__photo-tabs">
           <button
             type="button"
@@ -212,14 +283,25 @@
             v-for="photo in currentPhotos"
             :key="photo.photoId"
             class="admin__photo-item"
-            :class="{ 'admin__photo-item--selected': isSelected('photo', photo.photoId, photoTab) }"
-            @click="deleteMode && toggleSelect({ resource: 'photo', id: photo.photoId, side: photoTab })"
+            :class="{
+              'admin__photo-item--selected': deleteMode
+                ? isSelected('photo', photo.photoId, photoTab)
+                : isPhotoDownloadSelected(photo.photoId, photoTab),
+            }"
+            @click="onPhotoItemClick(photo)"
           >
             <label v-if="deleteMode" class="admin__photo-check" @click.stop>
               <input
                 type="checkbox"
                 :checked="isSelected('photo', photo.photoId, photoTab)"
                 @change="toggleSelect({ resource: 'photo', id: photo.photoId, side: photoTab })"
+              />
+            </label>
+            <label v-else class="admin__photo-check" @click.stop>
+              <input
+                type="checkbox"
+                :checked="isPhotoDownloadSelected(photo.photoId, photoTab)"
+                @change="togglePhotoDownload(photo.photoId, photoTab)"
               />
             </label>
             <img
@@ -232,7 +314,7 @@
               <p class="admin__photo-name">{{ photo.fileName }}</p>
               <p class="admin__photo-date">{{ formatDate(photo.uploadedAt) }}</p>
               <a
-                v-if="!deleteMode"
+                v-if="!deleteMode && isPhotoDownloadSelected(photo.photoId, photoTab)"
                 :href="photo.downloadUrl"
                 :download="photo.fileName"
                 target="_blank"
@@ -240,7 +322,7 @@
                 class="admin__download"
                 @click.stop
               >
-                원본 다운로드
+                개별 다운로드
               </a>
             </div>
           </li>
@@ -250,6 +332,12 @@
 
     <div v-if="deleteMode && data" class="admin__delete-bar">
       <span class="admin__delete-count">{{ selectedCount }}개 선택됨</span>
+      <button type="button" class="admin__bulk-btn" @click="selectAllDeletableItems">
+        모두 선택
+      </button>
+      <button type="button" class="admin__bulk-btn" @click="clearDeleteSelection">
+        모두 해제
+      </button>
       <button
         type="button"
         class="admin__delete-submit"
@@ -308,6 +396,8 @@ const photoTab = ref('groom')
 
 const deleteMode = ref(false)
 const selectedKeys = ref(new Set())
+const photoDownloadKeys = ref(new Set())
+const photoDownloading = ref(false)
 const showDeleteModal = ref(false)
 const deletePasswordInput = ref('')
 const deleteModalError = ref('')
@@ -321,6 +411,18 @@ const currentPhotos = computed(() => {
 })
 
 const selectedCount = computed(() => selectedKeys.value.size)
+
+const photoDownloadCount = computed(() => photoDownloadKeys.value.size)
+
+const allRsvpsSelected = computed(() => {
+  if (!data.value?.rsvps.length) return false
+  return data.value.rsvps.every((rsvp) => isSelected('rsvp', rsvp.rsvpId, rsvp.side))
+})
+
+const allGuestbookSelected = computed(() => {
+  if (!data.value?.guestbook.length) return false
+  return data.value.guestbook.every((msg) => isSelected('guestbook', msg.messageId))
+})
 
 function selectionKey({ resource, id, side }) {
   return `${resource}:${id}:${side ?? ''}`
@@ -339,6 +441,185 @@ function toggleSelect(item) {
     next.add(key)
   }
   selectedKeys.value = next
+}
+
+function addToSelection(items) {
+  const next = new Set(selectedKeys.value)
+  items.forEach((item) => next.add(selectionKey(item)))
+  selectedKeys.value = next
+}
+
+function removeFromSelection(items) {
+  const next = new Set(selectedKeys.value)
+  items.forEach((item) => next.delete(selectionKey(item)))
+  selectedKeys.value = next
+}
+
+function rsvpSelectionItems() {
+  if (!data.value) return []
+  return data.value.rsvps.map((rsvp) => ({
+    resource: 'rsvp',
+    id: rsvp.rsvpId,
+    side: rsvp.side,
+  }))
+}
+
+function guestbookSelectionItems() {
+  if (!data.value) return []
+  return data.value.guestbook.map((msg) => ({
+    resource: 'guestbook',
+    id: msg.messageId,
+  }))
+}
+
+function photoSelectionItems(side = null) {
+  if (!data.value) return []
+  const sides = side ? [side] : ['groom', 'bride']
+  return sides.flatMap((tab) =>
+    (data.value.photos[tab] ?? []).map((photo) => ({
+      resource: 'photo',
+      id: photo.photoId,
+      side: tab,
+    })),
+  )
+}
+
+function photoDownloadKey(photoId, side) {
+  return selectionKey({ resource: 'photo', id: photoId, side })
+}
+
+function isPhotoDownloadSelected(photoId, side) {
+  return photoDownloadKeys.value.has(photoDownloadKey(photoId, side))
+}
+
+function togglePhotoDownload(photoId, side) {
+  const key = photoDownloadKey(photoId, side)
+  const next = new Set(photoDownloadKeys.value)
+  if (next.has(key)) {
+    next.delete(key)
+  } else {
+    next.add(key)
+  }
+  photoDownloadKeys.value = next
+}
+
+function addToPhotoDownload(items) {
+  const next = new Set(photoDownloadKeys.value)
+  items.forEach((item) => next.add(photoDownloadKey(item.id, item.side)))
+  photoDownloadKeys.value = next
+}
+
+function clearPhotoDownloadSelection() {
+  photoDownloadKeys.value = new Set()
+}
+
+function selectAllCurrentTabPhotosForDownload() {
+  addToPhotoDownload(photoSelectionItems(photoTab.value))
+}
+
+function selectAllPhotosForDownload() {
+  addToPhotoDownload(photoSelectionItems())
+}
+
+function onPhotoItemClick(photo) {
+  if (deleteMode.value) {
+    toggleSelect({ resource: 'photo', id: photo.photoId, side: photoTab.value })
+    return
+  }
+  togglePhotoDownload(photo.photoId, photoTab.value)
+}
+
+function selectAllRsvps() {
+  addToSelection(rsvpSelectionItems())
+}
+
+function deselectAllRsvps() {
+  removeFromSelection(rsvpSelectionItems())
+}
+
+function toggleAllRsvps(event) {
+  if (event.target.checked) {
+    selectAllRsvps()
+  } else {
+    deselectAllRsvps()
+  }
+}
+
+function selectAllGuestbook() {
+  addToSelection(guestbookSelectionItems())
+}
+
+function deselectAllGuestbook() {
+  removeFromSelection(guestbookSelectionItems())
+}
+
+function toggleAllGuestbook(event) {
+  if (event.target.checked) {
+    selectAllGuestbook()
+  } else {
+    deselectAllGuestbook()
+  }
+}
+
+function selectAllCurrentTabPhotosForDelete() {
+  addToSelection(photoSelectionItems(photoTab.value))
+}
+
+function selectAllPhotosForDelete() {
+  addToSelection(photoSelectionItems())
+}
+
+function deselectAllCurrentTabPhotosForDelete() {
+  removeFromSelection(photoSelectionItems(photoTab.value))
+}
+
+function selectAllDeletableItems() {
+  addToSelection([
+    ...rsvpSelectionItems(),
+    ...guestbookSelectionItems(),
+    ...photoSelectionItems(),
+  ])
+}
+
+function clearDeleteSelection() {
+  selectedKeys.value = new Set()
+}
+
+function getSelectedPhotosForDownload() {
+  if (!data.value) return []
+  return ['groom', 'bride'].flatMap((side) =>
+    (data.value.photos[side] ?? [])
+      .filter((photo) => isPhotoDownloadSelected(photo.photoId, side))
+      .map((photo) => ({ ...photo, side })),
+  )
+}
+
+function triggerFileDownload(url, fileName) {
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = fileName
+  anchor.target = '_blank'
+  anchor.rel = 'noopener'
+  document.body.appendChild(anchor)
+  anchor.click()
+  document.body.removeChild(anchor)
+}
+
+async function downloadSelectedPhotos() {
+  const photos = getSelectedPhotosForDownload()
+  if (photos.length === 0) return
+
+  photoDownloading.value = true
+  try {
+    for (const [index, photo] of photos.entries()) {
+      triggerFileDownload(photo.downloadUrl, photo.fileName)
+      if (index < photos.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 350))
+      }
+    }
+  } finally {
+    photoDownloading.value = false
+  }
 }
 
 function parseSelectedItems() {
@@ -383,6 +664,7 @@ async function togglePhotoUpload() {
 function enterDeleteMode() {
   deleteMode.value = true
   selectedKeys.value = new Set()
+  photoDownloadKeys.value = new Set()
 }
 
 function exitDeleteMode() {
@@ -669,6 +951,57 @@ onMounted(async () => {
   margin-bottom: 2.5rem;
 }
 
+.admin__section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.admin__section-head .admin__section-title {
+  margin: 0;
+}
+
+.admin__section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin__bulk-btn {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #888);
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.admin__bulk-btn:hover:not(:disabled) {
+  border-color: var(--color-primary-dark, #e8899e);
+  color: var(--color-primary-dark, #e8899e);
+}
+
+.admin__bulk-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin__bulk-btn--primary {
+  color: #fff;
+  background: var(--color-primary-dark, #e8899e);
+  border-color: var(--color-primary-dark, #e8899e);
+}
+
+.admin__bulk-btn--primary:hover:not(:disabled) {
+  color: #fff;
+  background: var(--color-primary, #f4a7b9);
+  border-color: var(--color-primary, #f4a7b9);
+}
+
 .admin__section-title {
   margin: 0 0 1rem;
   font-size: 1.1rem;
@@ -827,13 +1160,17 @@ onMounted(async () => {
   box-shadow: 0 1px 4px rgb(0 0 0 / 6%);
 }
 
-.admin--delete-mode .admin__photo-item {
+.admin__photo-grid .admin__photo-item {
   cursor: pointer;
 }
 
 .admin__photo-item--selected {
-  outline: 2px solid #c0392b;
+  outline: 2px solid var(--color-primary-dark, #e8899e);
   outline-offset: 2px;
+}
+
+.admin--delete-mode .admin__photo-item--selected {
+  outline-color: #c0392b;
 }
 
 .admin__photo-check {
@@ -894,9 +1231,10 @@ onMounted(async () => {
   right: 0;
   z-index: 10;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.5rem 1rem;
   padding: 1rem 1.5rem;
   background: #fff;
   border-top: 1px solid #f0d0d0;
