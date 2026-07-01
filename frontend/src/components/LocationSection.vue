@@ -50,8 +50,39 @@
       >
         {{ item.label }}
       </button>
-      <div v-if="activeTransport" class="location__panel">
-        <p v-for="(line, i) in activeTransport.lines" :key="i" class="location__line">{{ line }}</p>
+      <div v-if="activeTransport" class="location__panel hanji-texture">
+        <div class="location__items">
+          <template v-for="(entry, i) in displayedTransportLines" :key="i">
+            <div v-if="entry.bus" class="location__bus-row">
+              <span class="location__bus-type">{{ entry.bus.label }}</span>
+              <div class="location__bus-nums">
+                <span
+                  v-for="(num, j) in entry.bus.numbers"
+                  :key="`${i}-${j}`"
+                  class="location__bus-num"
+                >
+                  {{ num }}
+                </span>
+              </div>
+            </div>
+
+            <p
+              v-else
+              class="location__line"
+              :class="{
+                'location__line--header': entry.isHeader,
+                'location__line--route': entry.isRoute,
+              }"
+            >
+              <span v-if="entry.isHeader" class="location__line-dot" aria-hidden="true">♥</span>
+              <template v-for="(segment, j) in entry.segments" :key="`${i}-${j}`">
+                <span v-if="segment.type === 'arrow'" class="location__route-arrow" aria-hidden="true">›</span>
+                <strong v-else-if="segment.bold" class="location__line-bold">{{ segment.text }}</strong>
+                <template v-else>{{ segment.text }}</template>
+              </template>
+            </p>
+          </template>
+        </div>
       </div>
     </div>
   </section>
@@ -92,6 +123,84 @@ function openTmap(event) {
 }
 
 const activeTransport = computed(() => wedding.value.transport[activeTab.value])
+
+const displayedTransportLines = computed(() => {
+  const transport = activeTransport.value
+  if (!transport) return []
+  return transport.lines.map((line) => {
+    const bus = parseBusLine(line)
+    return {
+      bus,
+      isHeader: !bus && isHeaderLine(line),
+      isRoute: !bus && isRouteLine(line),
+      segments: bus ? [] : parseRouteSegments(line),
+    }
+  })
+})
+
+function parseBoldLine(line) {
+  const parts = []
+  const regex = /<bold>(.*?)<\/bold>/g
+  let lastIndex = 0
+  let match = regex.exec(line)
+
+  while (match) {
+    if (match.index > lastIndex) {
+      parts.push({ text: line.slice(lastIndex, match.index), bold: false })
+    }
+    parts.push({ text: match[1], bold: true })
+    lastIndex = regex.lastIndex
+    match = regex.exec(line)
+  }
+
+  if (lastIndex < line.length) {
+    parts.push({ text: line.slice(lastIndex), bold: false })
+  }
+
+  if (parts.length === 0) {
+    parts.push({ text: line, bold: false })
+  }
+
+  return parts
+}
+
+function isHeaderLine(line) {
+  const trimmed = line.trim()
+  return /^<bold>[^<]+<\/bold>$/.test(trimmed) && !trimmed.includes('>')
+}
+
+function isRouteLine(line) {
+  return line.includes('>')
+}
+
+function parseRouteSegments(line) {
+  const segments = []
+  for (const part of parseBoldLine(line)) {
+    if (part.bold) {
+      segments.push({ type: 'text', text: part.text, bold: true })
+      continue
+    }
+    const chunks = part.text.split(/\s*>\s*/)
+    chunks.forEach((chunk, index) => {
+      if (chunk) {
+        segments.push({ type: 'text', text: chunk, bold: false })
+      }
+      if (index < chunks.length - 1) {
+        segments.push({ type: 'arrow' })
+      }
+    })
+  }
+  return segments
+}
+
+function parseBusLine(line) {
+  const match = line.match(/^(간 선|지 선|직 행)\s+(.+)$/)
+  if (!match) return null
+  return {
+    label: match[1],
+    numbers: match[2].split(/,\s*/),
+  }
+}
 
 async function copyAddress() {
   try {
@@ -190,19 +299,100 @@ async function copyAddress() {
 }
 
 .location__panel {
-  padding: 1rem 1.125rem;
-  border-radius: 12px;
+  padding: 1rem;
+  border-radius: 14px;
   background: #fff;
+  box-shadow: 0 2px 14px rgba(var(--color-primary-rgb), 0.1);
+}
+
+.location__items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .location__line {
-  margin: 0 0 0.375rem;
+  margin: 0;
+  padding: 0.625rem 0.75rem;
   font-size: 0.8125rem;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--color-text);
+  border-radius: 10px;
+  background: rgba(var(--color-primary-rgb), 0.06);
 }
 
-.location__line:last-child {
-  margin-bottom: 0;
+.location__line--header {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-accent);
+  font-weight: 600;
+  text-align: left;
+}
+
+.location__line--route {
+  background: #fff;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.18);
+  box-shadow: 0 1px 6px rgba(var(--color-primary-rgb), 0.06);
+}
+
+.location__line-dot {
+  flex-shrink: 0;
+  font-size: 0.625rem;
+  color: var(--color-primary);
+}
+
+.location__line-bold {
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.location__route-arrow {
+  margin: 0 0.2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.location__bus-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.18);
+}
+
+.location__bus-type {
+  flex-shrink: 0;
+  min-width: 2.25rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  background: var(--color-primary-dark);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.location__bus-nums {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.location__bus-num {
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.25);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #555;
+  line-height: 1.4;
 }
 </style>
