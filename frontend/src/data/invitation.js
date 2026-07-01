@@ -154,7 +154,8 @@ export const wedding = {
   dateISO: '2026-08-15T11:00:00+09:00',
   venue: '노블발렌티 삼성점',
   hall: '5층, 웨딩홀',
-  address: '서울특별시 강남구 영동대로 506',
+  address: '서울특별시 강남구 봉은사로 637 (서울 강남구 삼성동 109-6)',
+  addressCopy: '서울 강남구 삼성동 109-6',
   lat: 37.5088,
   lng: 127.0632,
   // lat/lng → LocationSection 지도 버튼 URL 자동 생성 (API 키 불필요)

@@ -5,23 +5,13 @@
     <div class="location__venue">
       <h3 class="location__venue-name">{{ wedding.venue }}</h3>
       <p class="location__hall">{{ wedding.hall }}</p>
-      <p class="location__address">{{ wedding.address }}</p>
+      <p class="location__address">
+        {{ addressMain }}<span v-if="wedding.addressCopy" class="location__address-note"> ({{ wedding.addressCopy }})</span>
+      </p>
+      <button type="button" class="btn-text location__copy-link" @click="copyAddress">
+        {{ copied ? t.location.copied : t.location.copyAddress }}
+      </button>
     </div>
-
-    <div class="location__map">
-      <VenueMap
-        :image-src="mapImage"
-        :lat="wedding.lat"
-        :lng="wedding.lng"
-        :naver-link="mapLinks.naver"
-        :title="wedding.venue"
-        :tap-hint="t.location.mapTapHint"
-      />
-    </div>
-
-    <button type="button" class="btn-outline location__copy" @click="copyAddress">
-      {{ copied ? t.location.copied : t.location.copyAddress }}
-    </button>
 
     <div class="location__links">
       <a :href="mapLinks.naver" target="_blank" rel="noopener noreferrer" class="btn-outline">
@@ -37,6 +27,17 @@
       <a :href="mapLinks.kakaoRoute" target="_blank" rel="noopener noreferrer" class="btn-outline">
         {{ t.location.kakaoMap }}
       </a>
+    </div>
+
+    <div class="location__map">
+      <VenueMap
+        :image-src="mapImage"
+        :lat="wedding.lat"
+        :lng="wedding.lng"
+        :naver-link="mapLinks.naver"
+        :title="wedding.venue"
+        :tap-hint="t.location.mapTapHint"
+      />
     </div>
 
     <div class="location__transport">
@@ -101,6 +102,12 @@ const activeTab = ref('subway')
 const copied = ref(false)
 
 const mapImage = computed(() => resolveAssetImage(wedding.value.mapImagePath))
+
+const addressMain = computed(() => {
+  const addr = wedding.value.address ?? ''
+  const idx = addr.indexOf(' (')
+  return idx >= 0 ? addr.slice(0, idx) : addr
+})
 
 const mapLinks = computed(() =>
   buildMapLinks({
@@ -204,7 +211,7 @@ function parseBusLine(line) {
 
 async function copyAddress() {
   try {
-    await navigator.clipboard.writeText(wedding.value.address)
+    await navigator.clipboard.writeText(wedding.value.addressCopy)
     copied.value = true
     setTimeout(() => { copied.value = false }, 2000)
   } catch {
@@ -219,7 +226,7 @@ async function copyAddress() {
 }
 
 .location__venue {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .location__venue-name {
@@ -240,9 +247,37 @@ async function copyAddress() {
   color: var(--color-event-venue);
 }
 
-.location__copy {
-  display: inline-block;
-  margin: 0 0 1rem;
+.location__address {
+  margin-bottom: 0.375rem;
+}
+
+.location__address-note {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.location__copy-link {
+  margin-top: 0.125rem;
+  font-size: 0.75rem;
+}
+
+.location__links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.location__links .btn-outline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.375rem;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  text-align: center;
+  text-decoration: none;
 }
 
 .location__map {
@@ -260,20 +295,6 @@ async function copyAddress() {
   position: absolute;
   inset: 0;
   min-height: 0;
-}
-
-.location__links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.location__links .btn-outline {
-  padding: 0.625rem 1rem;
-  font-size: 0.75rem;
-  text-decoration: none;
 }
 
 .location__transport {

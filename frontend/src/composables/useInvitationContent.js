@@ -29,6 +29,7 @@ export function useInvitationContent() {
     venue: t.value.wedding.venue,
     hall: weddingMeta.hall,
     address: weddingMeta.address,
+    addressCopy: weddingMeta.addressCopy,
     greeting: t.value.wedding.greeting,
     calendar: weddingMeta.calendar,
     dateISO: weddingMeta.dateISO,
