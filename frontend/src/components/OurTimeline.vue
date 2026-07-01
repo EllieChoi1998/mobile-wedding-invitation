@@ -94,7 +94,6 @@ const elapsedTime = computed(() => {
 
 .timeline__card {
   padding: 1rem 1.125rem;
-  border-radius: 12px;
   background: var(--color-accent);
 }
 

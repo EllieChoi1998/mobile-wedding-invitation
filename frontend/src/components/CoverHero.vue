@@ -71,6 +71,7 @@ const coverImage = computed(() => resolveAssetImage(coverData.imagePath))
 .cover-hero__greeting {
   margin: 0;
   font-size: 0.875rem;
+  font-weight: 300;
   line-height: 2;
   white-space: pre-line;
   color: var(--color-text-muted);

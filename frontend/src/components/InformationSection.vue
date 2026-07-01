@@ -27,7 +27,6 @@ const { information, t } = useInvitationContent()
 
 .information__item {
   padding: 1.125rem 1.25rem;
-  border-radius: 12px;
   background: var(--color-accent);
   text-align: center;
 }

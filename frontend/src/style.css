@@ -4,6 +4,46 @@
   box-sizing: border-box;
 }
 
+@font-face {
+  font-family: 'MaruBuri';
+  src: url('./assets/fonts/TTF/MaruBuri-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MaruBuri';
+  src: url('./assets/fonts/TTF/MaruBuri-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MaruBuri';
+  src: url('./assets/fonts/TTF/MaruBuri-Regular.ttf') format('truetype');
+  font-weight: 400 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MaruBuri';
+  src: url('./assets/fonts/TTF/MaruBuri-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MaruBuri';
+  src: url('./assets/fonts/TTF/MaruBuri-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --color-primary: #f4a7b9;
   --color-primary-dark: #e8899e;
@@ -12,23 +52,71 @@
   --color-text: #4a4a4a;
   --color-text-muted: #888;
   --color-primary-rgb: 244, 167, 185;
+  --hanji-clip: polygon(
+    0.3% 3%,
+    2% 0.2%,
+    9% 0.8%,
+    17% 0%,
+    28% 1.5%,
+    38% 0%,
+    46% 0.8%,
+    50% 0%,
+    54% 1.5%,
+    64% 0%,
+    74% 0.8%,
+    84% 0.2%,
+    94% 2%,
+    99.5% 4%,
+    100% 10%,
+    99.2% 18%,
+    100% 27%,
+    99% 36%,
+    100% 50%,
+    99.3% 63%,
+    100% 73%,
+    99% 83%,
+    100% 92%,
+    97.5% 99%,
+    89% 99.2%,
+    77% 100%,
+    66% 99.2%,
+    56% 99.6%,
+    50% 99%,
+    44% 99.6%,
+    34% 99.2%,
+    24% 99.6%,
+    13% 99.2%,
+    4% 99.5%,
+    0.3% 96%,
+    0.8% 85%,
+    0% 74%,
+    1% 62%,
+    0% 50%,
+    0.8% 38%,
+    0% 26%,
+    0.3% 3%
+  );
   --section-pad-y: 3.5rem;
   --section-pad-x: 1.5rem;
   --section-max-width: 480px;
-  --font-serif: 'Noto Serif KR', Georgia, serif;
+  --font-body: 'MaruBuri', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'MaruBuri', Georgia, serif;
 }
 
-/* 한지 질감 — 색상은 각 카드/컴포넌트 스타일 유지, 종이 섬유 패턴만 오버레이 */
+/* 한지 질감 + 불규칙 모서리 */
 .hanji-card {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+  -webkit-clip-path: var(--hanji-clip);
+  clip-path: var(--hanji-clip);
 }
 
 .hanji-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: inherit;
+  z-index: 0;
   background-image:
     repeating-linear-gradient(
       92deg,
@@ -42,6 +130,11 @@
   opacity: 0.5;
   mix-blend-mode: overlay;
   pointer-events: none;
+}
+
+.hanji-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .section {
@@ -89,6 +182,7 @@
 .section__desc {
   margin: 0;
   font-size: 0.8125rem;
+  font-weight: 300;
   line-height: 1.7;
   color: var(--color-text-muted);
   white-space: pre-line;
@@ -142,7 +236,6 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.875rem 0.25rem;
-  border-radius: 10px;
   background: #fff;
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
 }
@@ -222,10 +315,21 @@ body {
   margin: 0;
   width: 100%;
   overflow-x: hidden;
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
+  font-weight: 400;
   background: var(--color-bg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
+}
+
+/* 청첩장 본문·설명 — MaruBuri Light */
+.invitation :where(
+  [class*='__desc'],
+  [class*='__body'],
+  [class*='__greeting'],
+  [class*='__parents']
+) {
+  font-weight: 300;
 }
 
 #app {

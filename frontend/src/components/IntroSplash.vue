@@ -143,6 +143,7 @@ onUnmounted(() => {
 
 .intro-splash__names {
   margin: 0;
+  font-family: var(--font-serif);
   font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.5;
@@ -159,6 +160,7 @@ onUnmounted(() => {
 .intro-splash__datetime {
   margin: 0;
   font-size: 0.8125rem;
+  font-weight: 400;
   line-height: 1.5;
   color: var(--color-text);
 }
@@ -166,6 +168,7 @@ onUnmounted(() => {
 .intro-splash__venue {
   margin: 0;
   font-size: 0.8125rem;
+  font-weight: 300;
   line-height: 1.5;
   color: var(--color-text-muted);
 }

@@ -489,7 +489,7 @@ onMounted(async () => {
   max-width: 960px;
   margin: 0 auto;
   padding: 2rem 1.5rem 4rem;
-  font-family: var(--font-serif, 'Noto Serif KR', Georgia, serif);
+  font-family: var(--font-serif, 'MaruBuri', Georgia, serif);
   color: var(--color-text, #4a4a4a);
   background: var(--color-bg, #fffbfc);
   min-height: 100vh;

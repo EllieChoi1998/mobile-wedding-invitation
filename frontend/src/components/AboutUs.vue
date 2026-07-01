@@ -72,7 +72,6 @@ const bridePhoto = computed(() => resolveAssetImage(couple.bride.photoPath))
 .about__card {
   width: 60%;
   padding: 0.625rem;
-  border-radius: 12px;
   background: #fff;
   box-shadow: 0 2px 12px rgba(var(--color-primary-rgb), 0.12);
 }
