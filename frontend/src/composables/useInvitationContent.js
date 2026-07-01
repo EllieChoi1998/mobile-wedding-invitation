@@ -62,11 +62,18 @@ export function useInvitationContent() {
     return `${year}${t.value.wedding.calendarYearSuffix} ${month}${t.value.wedding.calendarMonthSuffix}`
   })
 
+  const localizedContacts = computed(() =>
+    contacts.map((contact) => ({
+      ...contact,
+      role: t.value.contactRoles[contact.roleKey],
+    })),
+  )
+
   return {
     couple,
     parents,
     parentsLine,
-    contacts,
+    contacts: localizedContacts,
     timeline,
     relationship,
     information,

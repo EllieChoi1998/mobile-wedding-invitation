@@ -5,7 +5,7 @@ export default {
     time: '오전 11시',
     venue: '노블발렌티 삼성점',
     greeting:
-      '저희 두 사람의 작은 만남이\n진실한 사랑으로 꽃피어\n오늘 이 자리를 빛내는 결혼식으로 이어졌습니다.\n\n평생 서로를 귀히 여기며\n처음의 설렘과 순수함을 잃지 않고\n존중하고 아껴 나가겠습니다.\n\n믿음과 사랑을 기초로 한 이 날에\n여러분의 따뜻한 축복이 함께 한다면\n더할 나위 없는 기쁨으로 간직하겠습니다.',
+      '과외로 시작된 평범했던 인연이\n4년의 시간 동안 서로의 일상이 되어,\n이제 평생을 함께할 가정을 이루려 합니다.\n\n나라가 새로운 빛을 맞이했던 8월 15일,\n저희도 새로운 빛을 밝히는 첫걸음을 내딛습니다.\n\n소중한 분들을 모시고\n이 기쁨을 함께 나누고 싶습니다.',
     calendarYearSuffix: '년',
     calendarMonthSuffix: '월',
   },
@@ -31,6 +31,17 @@ export default {
   contactModal: {
     title: '연락하기',
     close: '닫기',
+    call: '통화',
+    copy: '복사',
+    copied: '복사됨',
+  },
+  contactRoles: {
+    groom: '신랑',
+    bride: '신부',
+    groomFather: '신랑 父',
+    groomMother: '신랑 母',
+    brideFather: '신부 父',
+    brideMother: '신부 母',
   },
   about: {
     eyebrow: 'About Us',

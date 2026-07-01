@@ -7,10 +7,22 @@
         </button>
         <h3 class="contact-modal__title">{{ t.contactModal.title }}</h3>
         <ul class="contact-modal__list">
-          <li v-for="contact in contacts" :key="contact.phone" class="contact-modal__item">
+          <li v-for="(contact, index) in contacts" :key="contact.phone" class="contact-modal__item">
             <span class="contact-modal__role">{{ contact.role }}</span>
             <span class="contact-modal__name">{{ contact.name }}</span>
-            <a :href="`tel:${contact.phone}`" class="contact-modal__phone">{{ contact.phone }}</a>
+            <div class="contact-modal__phone-group">
+              <span class="contact-modal__phone">{{ contact.phone }}</span>
+              <a :href="telHref(contact.phone)" class="contact-modal__action contact-modal__action--call">
+                {{ t.contactModal.call }}
+              </a>
+              <button
+                type="button"
+                class="contact-modal__action contact-modal__action--copy"
+                @click="copyPhone(contact.phone, index)"
+              >
+                {{ copiedIndex === index ? t.contactModal.copied : t.contactModal.copy }}
+              </button>
+            </div>
           </li>
         </ul>
       </div>
@@ -19,6 +31,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useInvitationContent } from '../composables/useInvitationContent'
 
 defineProps({
@@ -28,6 +41,42 @@ defineProps({
 const emit = defineEmits(['close'])
 
 const { contacts, t } = useInvitationContent()
+const copiedIndex = ref(-1)
+
+function telHref(phone) {
+  return `tel:${phone.replace(/[^\d+]/g, '')}`
+}
+
+async function copyPhone(phone, index) {
+  const copied = await writeClipboard(phone)
+  if (!copied) return
+  copiedIndex.value = index
+  setTimeout(() => {
+    copiedIndex.value = -1
+  }, 2000)
+}
+
+async function writeClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    try {
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.setAttribute('readonly', '')
+      textarea.style.position = 'fixed'
+      textarea.style.left = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.select()
+      const ok = document.execCommand('copy')
+      document.body.removeChild(textarea)
+      return ok
+    } catch {
+      return false
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -85,8 +134,8 @@ const { contacts, t } = useInvitationContent()
 
 .contact-modal__item {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 0.5rem 0.75rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.5rem 0.625rem;
   align-items: center;
   padding: 0.875rem 0;
   border-bottom: 1px solid rgba(244, 167, 185, 0.15);
@@ -99,17 +148,58 @@ const { contacts, t } = useInvitationContent()
 .contact-modal__role {
   font-size: 0.75rem;
   color: var(--color-primary);
+  white-space: nowrap;
 }
 
 .contact-modal__name {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-modal__phone-group {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.35);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
 }
 
 .contact-modal__phone {
-  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  padding: 0.3125rem 0.4375rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-primary-dark);
+  background: var(--color-accent);
+  white-space: nowrap;
+}
+
+.contact-modal__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3125rem 0.4375rem;
+  border: none;
+  border-left: 1px solid rgba(var(--color-primary-rgb), 0.35);
+  background: #fff;
+  font-size: 0.6875rem;
+  font-weight: 500;
   color: var(--color-primary-dark);
   text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.contact-modal__action:active {
+  background: var(--color-accent);
 }
 </style>

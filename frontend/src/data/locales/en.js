@@ -31,6 +31,17 @@ export default {
   contactModal: {
     title: 'Contact',
     close: 'Close',
+    call: 'Call',
+    copy: 'Copy',
+    copied: 'Copied',
+  },
+  contactRoles: {
+    groom: 'Groom',
+    bride: 'Bride',
+    groomFather: "Groom's Father",
+    groomMother: "Groom's Mother",
+    brideFather: "Bride's Father",
+    brideMother: "Bride's Mother",
   },
   about: {
     eyebrow: 'About Us',

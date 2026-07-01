@@ -93,12 +93,12 @@ export const parents = {
 }
 
 export const contacts = [
-  { role: '신랑', name: '조 문경', phone: '010-9911-2146' },
-  { role: '신부', name: '최 혜령', phone: '010-4586-5811' },
-  { role: '신랑 아버지', name: '조 석영', phone: '010-4231-2146' },
-  { role: '신랑 어머니', name: '김 경화', phone: '010-4309-2146' },
-  { role: '신부 아버지', name: '최 태경', phone: '010-3261-5811' },
-  { role: '신부 어머니', name: '강 미선', phone: '010-2380-5689' },
+  { roleKey: 'groom', name: '조 문경', phone: '010-9911-2146' },
+  { roleKey: 'bride', name: '최 혜령', phone: '010-4586-5811' },
+  { roleKey: 'groomFather', name: '조 석영', phone: '010-4231-2146' },
+  { roleKey: 'groomMother', name: '김 경화', phone: '010-4309-2146' },
+  { roleKey: 'brideFather', name: '최 태경', phone: '010-3261-5811' },
+  { roleKey: 'brideMother', name: '강 미선', phone: '010-2380-5689' },
 ]
 
 export const timeline = [
