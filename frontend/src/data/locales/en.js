@@ -182,8 +182,5 @@ export default {
     createdBy: 'Created by',
     builtOn: 'Built',
   },
-  sectionPhoto: {
-    midHint: 'assets/sections/middle.jpg — divider photo',
-  },
   pageTitle: 'Wedding Invitation',
 }

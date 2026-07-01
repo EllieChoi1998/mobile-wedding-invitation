@@ -182,8 +182,5 @@ export default {
     createdBy: '제작',
     builtOn: '제작일',
   },
-  sectionPhoto: {
-    midHint: 'assets/sections/middle.jpg — 구분용 풀샷 사진',
-  },
   pageTitle: '모바일 청첩장',
 }

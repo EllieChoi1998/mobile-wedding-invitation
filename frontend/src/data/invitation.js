@@ -215,7 +215,6 @@ export const accounts = {
 }
 
 export const assets = {
-  midPhoto: 'sections/middle.jpg',
   endingPhoto: 'sections/ending.jpg',
 }
 
