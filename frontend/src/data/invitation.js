@@ -23,8 +23,8 @@ export const couple = {
     photoPath: 'about/groom.jpg',
     account: {
       name: '조 문경',
-      bank: '하나은행',
-      accountNumber: '123456-01-000001',
+      bank: '우리은행',
+      accountNumber: '1002-945-373-201',
       holder: '조 문경',
     },
   },
@@ -64,14 +64,14 @@ export const parents = {
     label: '신랑 측 혼주',
     father: {
       name: '조 석영',
-      bank: '국민은행',
-      accountNumber: '123456-01-123456',
+      bank: '신한은행',
+      accountNumber: '110-522-914420',
       holder: '조 석영',
     },
     mother: {
       name: '김 경화',
       bank: '신한은행',
-      accountNumber: '110-123-456789',
+      accountNumber: '110-446-401825',
       holder: '김 경화',
     },
   },
