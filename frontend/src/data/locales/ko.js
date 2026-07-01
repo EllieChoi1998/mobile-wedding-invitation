@@ -14,7 +14,9 @@ export default {
     groom: '신랑 측',
     bride: '신부 측',
   },
-  sideNavLabel: '청첩장 측 선택',
+  langKo: '한국어',
+  langEn: 'English',
+  langNavLabel: '언어 선택',
   cover: {
     eyebrow: 'Invitation',
     title: '소중한 분들을 초대합니다',
@@ -145,7 +147,7 @@ export default {
   rsvp: {
     eyebrow: 'Rsvp',
     title: '참석 의사 전달',
-    desc: '보내주시는 귀한 걸음에 소홀함이 없도록 \n 정성껏 준비하겠습니다',
+    desc: '귀한 걸음에 감사드리며,\n정성껏 준비하겠습니다',
     name: '성함',
     namePlaceholder: '이름을 입력해 주세요',
     sideLegend: '어느 측 하객이신가요?',

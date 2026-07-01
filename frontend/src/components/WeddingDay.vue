@@ -2,9 +2,16 @@
   <section class="wedding-day section section--white">
     <SectionHeader :eyebrow="t.weddingDay.eyebrow" :title="t.weddingDay.title" />
 
-    <p class="wedding-day__datetime">
-      {{ wedding.date }} {{ wedding.dayNote }} {{ wedding.time }}
-    </p>
+    <dl class="wedding-day__info">
+      <div class="wedding-day__info-row">
+        <dt>{{ t.weddingDay.date }}</dt>
+        <dd>{{ wedding.date }} ({{ wedding.dayNote }})<br />{{ wedding.time }}</dd>
+      </div>
+      <div class="wedding-day__info-row">
+        <dt>{{ t.weddingDay.venue }}</dt>
+        <dd>{{ wedding.venue }}<br />{{ wedding.hall }}</dd>
+      </div>
+    </dl>
 
     <div class="countdown">
       <div class="countdown__item hanji-card">
@@ -55,17 +62,6 @@
         </span>
       </div>
     </div>
-
-    <dl class="wedding-day__info">
-      <div class="wedding-day__info-row">
-        <dt>{{ t.weddingDay.date }}</dt>
-        <dd>{{ wedding.date }} ({{ wedding.dayNote }})<br />{{ wedding.time }}</dd>
-      </div>
-      <div class="wedding-day__info-row">
-        <dt>{{ t.weddingDay.venue }}</dt>
-        <dd>{{ wedding.venue }}<br />{{ wedding.hall }}</dd>
-      </div>
-    </dl>
   </section>
 </template>
 
@@ -107,17 +103,15 @@ const calendarCells = computed(() => {
   text-align: center;
 }
 
-.wedding-day__datetime {
-  margin: 0 0 0.5rem;
-  font-family: var(--font-serif);
-  font-size: 0.9375rem;
-  color: var(--color-primary-dark);
-}
-
 .wedding-day__countdown-msg {
   margin: 0 0 1.5rem;
   font-size: 0.8125rem;
   color: var(--color-text-muted);
+}
+
+.wedding-day__info {
+  margin: 0 0 1.5rem;
+  text-align: center;
 }
 
 .wedding-calendar {
@@ -195,11 +189,6 @@ const calendarCells = computed(() => {
   line-height: 1;
 }
 
-.wedding-day__info {
-  margin: 0;
-  text-align: center;
-}
-
 .wedding-day__info-row {
   padding: 1rem 0;
   border-top: 1px solid rgba(var(--color-primary-rgb), 0.2);
@@ -211,15 +200,18 @@ const calendarCells = computed(() => {
 
 .wedding-day__info-row dt {
   margin-bottom: 0.375rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
-  color: var(--color-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-primary-dark);
 }
 
 .wedding-day__info-row dd {
   margin: 0;
-  font-size: 0.9375rem;
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  font-weight: 500;
   line-height: 1.7;
-  color: var(--color-text);
+  color: var(--color-event-venue);
 }
 </style>

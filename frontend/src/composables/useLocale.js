@@ -17,26 +17,17 @@ export function useLocale() {
   const route = useRoute()
   const { side } = useSide()
 
-  const locale = computed(() => {
-    if (side.value !== 'bride') return 'ko'
-    return normalizeLang(route.query.lang)
-  })
+  const locale = computed(() => normalizeLang(route.query.lang))
 
   const t = computed(() => LOCALES[locale.value])
   const isEnglish = computed(() => locale.value === 'en')
 
-  function queryForSide(targetSide) {
-    if (targetSide === 'bride' && isEnglish.value) {
-      return { side: 'bride', lang: 'en' }
-    }
-    return { side: targetSide }
-  }
-
   function queryForLocale(targetLocale) {
+    const query = { side: side.value }
     if (targetLocale === 'en') {
-      return { side: 'bride', lang: 'en' }
+      query.lang = 'en'
     }
-    return { side: 'bride' }
+    return query
   }
 
   watch(
@@ -52,7 +43,6 @@ export function useLocale() {
     locale,
     t,
     isEnglish,
-    queryForSide,
     queryForLocale,
   }
 }

@@ -51,6 +51,10 @@
   --color-bg: #fffbfc;
   --color-text: #4a4a4a;
   --color-text-muted: #888;
+  --color-event-datetime: #2a2a2a;
+  --color-event-venue: #333;
+  --font-size-event-datetime: 1.0625rem;
+  --font-size-event-venue: 1rem;
   --color-primary-rgb: 244, 167, 185;
   --hanji-clip: polygon(
     0.1% 0.75%,

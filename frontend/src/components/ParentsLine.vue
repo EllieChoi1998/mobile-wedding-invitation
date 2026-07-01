@@ -1,9 +1,6 @@
 <template>
   <div class="parents-line">
-    <div
-      class="parents-line__row"
-      :class="{ 'parents-line__row--active': side === 'groom' }"
-    >
+    <div class="parents-line__row hanji-card parents-line__row--groom">
       <span class="parents-line__name">{{ couple.groom.fullName }}</span>
       <span class="parents-line__parents">
         {{ parentsLine.groom.father }} · {{ parentsLine.groom.mother }}{{ t.parentsLine.groomPrefix }}
@@ -11,10 +8,7 @@
       </span>
     </div>
     <span class="parents-line__amp">&</span>
-    <div
-      class="parents-line__row"
-      :class="{ 'parents-line__row--active': side === 'bride' }"
-    >
+    <div class="parents-line__row hanji-card parents-line__row--bride">
       <span class="parents-line__name">{{ couple.bride.fullName }}</span>
       <span class="parents-line__parents">
         {{ parentsLine.bride.father }} · {{ parentsLine.bride.mother }}{{ t.parentsLine.bridePrefix }}
@@ -32,7 +26,7 @@ import { useInvitationContent } from '../composables/useInvitationContent'
 
 const emit = defineEmits(['contact'])
 
-const { couple, parentsLine, side, t } = useInvitationContent()
+const { couple, parentsLine, t } = useInvitationContent()
 </script>
 
 <style scoped>
@@ -46,14 +40,20 @@ const { couple, parentsLine, side, t } = useInvitationContent()
 }
 
 .parents-line__row {
+  width: 72%;
   padding: 0.75rem 1rem;
-  border-radius: 10px;
-  transition: background 0.2s;
+  background: var(--color-accent);
+  box-shadow: 0 2px 12px rgba(var(--color-primary-rgb), 0.12);
 }
 
-.parents-line__row--active {
-  background: var(--color-accent);
-  box-shadow: inset 0 0 0 1.5px rgba(244, 167, 185, 0.35);
+.parents-line__row--groom {
+  align-self: flex-start;
+  text-align: left;
+}
+
+.parents-line__row--bride {
+  align-self: flex-end;
+  text-align: right;
 }
 
 .parents-line__name {

@@ -14,7 +14,9 @@ export default {
     groom: "Groom's Side",
     bride: "Bride's Side",
   },
-  sideNavLabel: 'Invitation side',
+  langKo: '한국어',
+  langEn: 'English',
+  langNavLabel: 'Language',
   cover: {
     eyebrow: 'Invitation',
     title: 'We invite you to celebrate with us',

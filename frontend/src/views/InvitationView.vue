@@ -2,13 +2,13 @@
   <div class="invitation">
     <SideToolbar />
     <CoverHero />
-    <AboutUs />
-    <OurTimeline />
     <WeddingDay />
     <LocationSection />
     <GallerySection />
-    <InformationSection />
     <AccountSection />
+    <InformationSection />
+    <AboutUs />
+    <OurTimeline />
     <GuestbookSection />
     <GuestGallery />
     <RsvpForm />

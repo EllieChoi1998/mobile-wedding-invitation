@@ -114,19 +114,21 @@ async function copyAddress() {
 }
 
 .location__venue-name {
-  margin: 0 0 0.25rem;
+  margin: 0 0 0.375rem;
   font-family: var(--font-serif);
-  font-size: 1.0625rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: #333;
+  color: var(--color-event-datetime);
+  letter-spacing: 0.01em;
 }
 
 .location__hall,
 .location__address {
   margin: 0 0 0.5rem;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-event-venue);
+  font-weight: 500;
   line-height: 1.6;
-  color: var(--color-text-muted);
+  color: var(--color-event-venue);
 }
 
 .location__copy {

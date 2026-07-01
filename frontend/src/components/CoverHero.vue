@@ -1,12 +1,6 @@
 <template>
   <header class="cover-hero section section--hero">
-    <div class="cover-hero__image">
-      <ImageWithPlaceholder
-        :src="coverImage"
-        :alt="`${couple.groom.fullName} & ${couple.bride.fullName}`"
-        :placeholder-label="`${coverData.imagePath} — 커버/히어로 사진`"
-      />
-    </div>
+    <CoverSplashBlock variant="section" />
 
     <div class="cover-hero__content">
       <p class="cover-hero__eyebrow">{{ t.cover.eyebrow }}</p>
@@ -20,30 +14,20 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { resolveAssetImage } from '../composables/useAssetImage'
+import { ref } from 'vue'
 import { useInvitationContent } from '../composables/useInvitationContent'
-import ImageWithPlaceholder from './ImageWithPlaceholder.vue'
+import CoverSplashBlock from './CoverSplashBlock.vue'
 import ParentsLine from './ParentsLine.vue'
 import ContactModal from './ContactModal.vue'
-import { cover as coverData } from '../data/invitation'
 
-const { couple, wedding, t } = useInvitationContent()
+const { wedding, t } = useInvitationContent()
 const contactOpen = ref(false)
-
-const coverImage = computed(() => resolveAssetImage(coverData.imagePath))
 </script>
 
 <style scoped>
 .cover-hero {
   padding-left: 0;
   padding-right: 0;
-}
-
-.cover-hero__image {
-  width: 100%;
-  aspect-ratio: 3 / 4;
-  max-height: 210px;
 }
 
 .cover-hero__content {
