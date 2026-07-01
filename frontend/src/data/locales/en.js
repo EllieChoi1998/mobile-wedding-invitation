@@ -43,6 +43,8 @@ export default {
     title: 'Our Story',
     desc: 'From the first moment until now',
     counterDayUnit: 'd',
+    showMore: 'Show more',
+    showLess: 'Show less',
   },
   interview: {
     eyebrow: 'Interview',

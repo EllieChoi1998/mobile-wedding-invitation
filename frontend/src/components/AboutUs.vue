@@ -3,7 +3,7 @@
     <SectionHeader :eyebrow="t.about.eyebrow" :title="t.about.title" />
 
     <div class="about__grid">
-      <article class="about__card about__card--groom">
+      <article class="about__card hanji-card about__card--groom">
         <div class="about__photo">
           <ImageWithPlaceholder
             :src="groomPhoto"
@@ -24,7 +24,7 @@
         </p>
       </article>
 
-      <article class="about__card about__card--bride">
+      <article class="about__card hanji-card about__card--bride">
         <div class="about__photo">
           <ImageWithPlaceholder
             :src="bridePhoto"
@@ -74,7 +74,7 @@ const bridePhoto = computed(() => resolveAssetImage(couple.bride.photoPath))
   padding: 0.625rem;
   border-radius: 12px;
   background: #fff;
-  box-shadow: 0 2px 12px rgba(244, 167, 185, 0.12);
+  box-shadow: 0 2px 12px rgba(var(--color-primary-rgb), 0.12);
 }
 
 .about__card--groom {

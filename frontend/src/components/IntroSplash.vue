@@ -125,7 +125,7 @@ onUnmounted(() => {
 .intro-splash__image-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, var(--color-accent) 0%, rgba(244, 167, 185, 0.3) 100%);
+  background: linear-gradient(180deg, var(--color-accent) 0%, rgba(var(--color-primary-rgb), 0.3) 100%);
 }
 
 .intro-splash__text {

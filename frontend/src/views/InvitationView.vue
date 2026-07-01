@@ -4,7 +4,6 @@
     <CoverHero />
     <AboutUs />
     <OurTimeline />
-    <InterviewSection />
     <WeddingDay />
     <LocationSection />
     <SectionPhoto
@@ -27,7 +26,6 @@ import SideToolbar from '../components/SideToolbar.vue'
 import CoverHero from '../components/CoverHero.vue'
 import AboutUs from '../components/AboutUs.vue'
 import OurTimeline from '../components/OurTimeline.vue'
-import InterviewSection from '../components/InterviewSection.vue'
 import WeddingDay from '../components/WeddingDay.vue'
 import LocationSection from '../components/LocationSection.vue'
 import SectionPhoto from '../components/SectionPhoto.vue'
@@ -49,6 +47,6 @@ const { assets, t } = useInvitationContent()
   margin: 0 auto;
   min-height: 100vh;
   background: #fff;
-  box-shadow: 0 0 48px rgba(244, 167, 185, 0.1);
+  box-shadow: 0 0 48px rgba(var(--color-primary-rgb), 0.1);
 }
 </style>

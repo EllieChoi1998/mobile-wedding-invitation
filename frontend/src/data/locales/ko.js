@@ -43,6 +43,8 @@ export default {
     title: '우리의 이야기',
     desc: '처음 만난 순간부터 지금까지',
     counterDayUnit: '일',
+    showMore: '더보기',
+    showLess: '접기',
   },
   interview: {
     eyebrow: 'Interview',

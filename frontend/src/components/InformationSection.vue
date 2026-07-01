@@ -3,7 +3,7 @@
     <SectionHeader :eyebrow="t.information.eyebrow" :title="t.information.title" />
 
     <div class="information__list">
-      <article v-for="(item, index) in information" :key="index" class="information__item">
+      <article v-for="(item, index) in information" :key="index" class="information__item hanji-card">
         <h3 class="information__item-title">{{ item.title }}</h3>
         <p class="information__item-body">{{ item.body }}</p>
       </article>

@@ -7,19 +7,19 @@
     </p>
 
     <div class="countdown">
-      <div class="countdown__item">
+      <div class="countdown__item hanji-card">
         <span class="countdown__value">{{ pad(countdown.days) }}</span>
         <span class="countdown__label">{{ t.weddingDay.days }}</span>
       </div>
-      <div class="countdown__item">
+      <div class="countdown__item hanji-card">
         <span class="countdown__value">{{ pad(countdown.hours) }}</span>
         <span class="countdown__label">{{ t.weddingDay.hours }}</span>
       </div>
-      <div class="countdown__item">
+      <div class="countdown__item hanji-card">
         <span class="countdown__value">{{ pad(countdown.minutes) }}</span>
         <span class="countdown__label">{{ t.weddingDay.minutes }}</span>
       </div>
-      <div class="countdown__item">
+      <div class="countdown__item hanji-card">
         <span class="countdown__value">{{ pad(countdown.seconds) }}</span>
         <span class="countdown__label">{{ t.weddingDay.seconds }}</span>
       </div>
@@ -29,7 +29,7 @@
       {{ countdownMessage }}
     </p>
 
-    <div class="wedding-calendar">
+    <div class="wedding-calendar hanji-card">
       <p class="wedding-calendar__month">{{ calendarLabel }}</p>
       <div class="wedding-calendar__weekdays">
         <span v-for="label in weekdays" :key="label" class="wedding-calendar__weekday">{{ label }}</span>
@@ -183,7 +183,7 @@ const calendarCells = computed(() => {
   background: #fff;
   font-weight: 700;
   color: var(--color-primary-dark);
-  box-shadow: 0 0 0 3px rgba(244, 167, 185, 0.25);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
 }
 
 .wedding-calendar__heart-icon {
@@ -202,11 +202,11 @@ const calendarCells = computed(() => {
 
 .wedding-day__info-row {
   padding: 1rem 0;
-  border-top: 1px solid rgba(244, 167, 185, 0.2);
+  border-top: 1px solid rgba(var(--color-primary-rgb), 0.2);
 }
 
 .wedding-day__info-row:last-child {
-  border-bottom: 1px solid rgba(244, 167, 185, 0.2);
+  border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.2);
 }
 
 .wedding-day__info-row dt {

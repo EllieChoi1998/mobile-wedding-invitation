@@ -7,10 +7,10 @@
     />
 
     <ol class="timeline__list">
-      <li v-for="(item, index) in timeline" :key="index" class="timeline__item">
+      <li v-for="(item, index) in visibleItems" :key="index" class="timeline__item">
         <div class="timeline__dot" />
         <div
-          class="timeline__card"
+          class="timeline__card hanji-card"
           :class="{ 'timeline__card--with-counter': item.showRelationshipCounter }"
         >
           <div class="timeline__card-main">
@@ -28,11 +28,20 @@
         </div>
       </li>
     </ol>
+
+    <button
+      v-if="timeline.length > initialCount"
+      type="button"
+      class="btn-text timeline__toggle"
+      @click="expanded = !expanded"
+    >
+      {{ expanded ? t.timeline.showLess : t.timeline.showMore }}
+    </button>
   </section>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { relationship } from '../data/invitation'
 import { useRelationshipCounter } from '../composables/useRelationshipCounter'
 import { useInvitationContent } from '../composables/useInvitationContent'
@@ -40,6 +49,13 @@ import SectionHeader from './SectionHeader.vue'
 
 const { timeline, t } = useInvitationContent()
 const elapsed = useRelationshipCounter(relationship.startDateISO)
+
+const initialCount = 1
+const expanded = ref(false)
+
+const visibleItems = computed(() =>
+  expanded.value ? timeline : timeline.slice(0, initialCount),
+)
 
 const elapsedTime = computed(() => {
   const pad = (n) => String(n).padStart(2, '0')
@@ -53,7 +69,7 @@ const elapsedTime = computed(() => {
   list-style: none;
   margin: 0;
   padding: 0 0 0 1.25rem;
-  border-left: 2px solid rgba(244, 167, 185, 0.35);
+  border-left: 2px solid rgba(var(--color-primary-rgb), 0.35);
 }
 
 .timeline__item {
@@ -73,7 +89,7 @@ const elapsedTime = computed(() => {
   height: 0.625rem;
   border-radius: 50%;
   background: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(244, 167, 185, 0.25);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
 }
 
 .timeline__card {
@@ -156,5 +172,10 @@ const elapsedTime = computed(() => {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   color: var(--color-text-muted);
+}
+
+.timeline__toggle {
+  display: block;
+  margin: 1.5rem auto 0;
 }
 </style>
