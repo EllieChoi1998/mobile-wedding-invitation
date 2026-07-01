@@ -156,6 +156,11 @@ export default {
     submitting: 'Sending...',
     success: 'Thank you! Your RSVP has been received.',
     error: 'Something went wrong. Please try again.',
+    close: 'Close',
+    floatingOpen: 'Send RSVP',
+    validationName: 'Please enter your name.',
+    validationSide: 'Please select groom or bride side.',
+    validationAttending: 'Please select whether you will attend.',
   },
   guestGallery: {
     eyebrow: 'Guest Album',

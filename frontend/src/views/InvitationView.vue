@@ -8,15 +8,19 @@
     <LocationSection />
     <GallerySection />
     <InformationSection />
-    <RsvpForm />
     <AccountSection />
     <GuestbookSection />
     <GuestGallery />
+    <RsvpForm />
     <EndingSection />
+
+    <RsvpModal :open="rsvpPopupOpen" @close="rsvpPopupOpen = false" />
+    <RsvpFloatingButton v-if="!rsvpPopupOpen" @open="rsvpPopupOpen = true" />
   </div>
 </template>
 
 <script setup>
+import { inject, ref, watch } from 'vue'
 import SideToolbar from '../components/SideToolbar.vue'
 import CoverHero from '../components/CoverHero.vue'
 import AboutUs from '../components/AboutUs.vue'
@@ -28,8 +32,25 @@ import InformationSection from '../components/InformationSection.vue'
 import GuestbookSection from '../components/GuestbookSection.vue'
 import AccountSection from '../components/AccountSection.vue'
 import RsvpForm from '../components/RsvpForm.vue'
+import RsvpModal from '../components/RsvpModal.vue'
+import RsvpFloatingButton from '../components/RsvpFloatingButton.vue'
 import GuestGallery from '../components/GuestGallery.vue'
 import EndingSection from '../components/EndingSection.vue'
+
+const invitationReady = inject('invitationReady', ref(true))
+const rsvpPopupOpen = ref(false)
+let initialPopupShown = false
+
+watch(
+  invitationReady,
+  (ready) => {
+    if (ready && !initialPopupShown) {
+      rsvpPopupOpen.value = true
+      initialPopupShown = true
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped>

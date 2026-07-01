@@ -145,7 +145,7 @@ export default {
   rsvp: {
     eyebrow: 'Rsvp',
     title: '참석 의사 전달',
-    desc: '보내주시는 귀한 걸음에 소홀함이 없도록 정성껏 준비하겠습니다',
+    desc: '보내주시는 귀한 걸음에 소홀함이 없도록 \n 정성껏 준비하겠습니다',
     name: '성함',
     namePlaceholder: '이름을 입력해 주세요',
     sideLegend: '어느 측 하객이신가요?',
@@ -156,6 +156,11 @@ export default {
     submitting: '전송 중...',
     success: '참석 의사가 전달되었습니다. 감사합니다!',
     error: '전송에 실패했습니다. 다시 시도해 주세요.',
+    close: '닫기',
+    floatingOpen: 'RSVP 전달하기',
+    validationName: '성함을 입력해 주세요.',
+    validationSide: '하객 측을 선택해 주세요.',
+    validationAttending: '참석 여부를 선택해 주세요.',
   },
   guestGallery: {
     eyebrow: 'Guest Album',
