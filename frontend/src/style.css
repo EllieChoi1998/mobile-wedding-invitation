@@ -9,7 +9,7 @@
   src: url('./assets/fonts/TTF/MaruBuri-ExtraLight.ttf') format('truetype');
   font-weight: 200;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {
@@ -17,7 +17,7 @@
   src: url('./assets/fonts/TTF/MaruBuri-Light.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {
@@ -25,7 +25,7 @@
   src: url('./assets/fonts/TTF/MaruBuri-Regular.ttf') format('truetype');
   font-weight: 400 500;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {
@@ -33,7 +33,7 @@
   src: url('./assets/fonts/TTF/MaruBuri-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {
@@ -41,7 +41,7 @@
   src: url('./assets/fonts/TTF/MaruBuri-Bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 :root {
@@ -101,35 +101,36 @@
   --section-max-width: 480px;
   --font-body: 'MaruBuri', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-serif: 'MaruBuri', Georgia, serif;
+  --hanji-texture-gradient: repeating-linear-gradient(
+    92deg,
+    transparent,
+    transparent 5px,
+    rgba(255, 255, 255, 0.55) 5px,
+    rgba(255, 255, 255, 0.55) 6px
+  );
+  --hanji-texture-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
 }
 
-/* 한지 질감 + 불규칙 모서리 */
+.hanji-card::before,
+.section--accent::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--hanji-texture-gradient), var(--hanji-texture-noise);
+  background-size: auto, 88px 88px;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* 한지 질감 + 불규칙 모서리 (카드만) */
 .hanji-card {
   position: relative;
   overflow: hidden;
   isolation: isolate;
   -webkit-clip-path: var(--hanji-clip);
   clip-path: var(--hanji-clip);
-}
-
-.hanji-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image:
-    repeating-linear-gradient(
-      92deg,
-      transparent,
-      transparent 5px,
-      rgba(255, 255, 255, 0.55) 5px,
-      rgba(255, 255, 255, 0.55) 6px
-    ),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  background-size: auto, 88px 88px;
-  opacity: 0.5;
-  mix-blend-mode: overlay;
-  pointer-events: none;
 }
 
 .hanji-card > * {
@@ -146,7 +147,14 @@
 }
 
 .section--accent {
+  position: relative;
+  isolation: isolate;
   background: var(--color-accent);
+}
+
+.section--accent > * {
+  position: relative;
+  z-index: 1;
 }
 
 .section--hero {
