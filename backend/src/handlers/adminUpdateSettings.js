@@ -1,5 +1,5 @@
 import { verifyAdminPassword } from '../lib/auth.js'
-import { setPhotoUploadOpen } from '../lib/settings.js'
+import { updateAppSettings } from '../lib/settings.js'
 import { jsonResponse } from '../lib/response.js'
 
 export async function handler(event) {
@@ -8,13 +8,26 @@ export async function handler(event) {
     if (authError) return authError
 
     const body = JSON.parse(event.body || '{}')
-    const { photoUploadOpen } = body
+    const { photoUploadOpen, guestbookOpen, rsvpOpen } = body
+    const updates = {}
 
-    if (typeof photoUploadOpen !== 'boolean') {
-      return jsonResponse(400, { message: 'photoUploadOpen must be a boolean' })
+    if (typeof photoUploadOpen === 'boolean') {
+      updates.photoUploadOpen = photoUploadOpen
+    }
+    if (typeof guestbookOpen === 'boolean') {
+      updates.guestbookOpen = guestbookOpen
+    }
+    if (typeof rsvpOpen === 'boolean') {
+      updates.rsvpOpen = rsvpOpen
     }
 
-    const settings = await setPhotoUploadOpen(photoUploadOpen)
+    if (Object.keys(updates).length === 0) {
+      return jsonResponse(400, {
+        message: 'At least one of photoUploadOpen, guestbookOpen, rsvpOpen must be a boolean',
+      })
+    }
+
+    const settings = await updateAppSettings(updates)
     return jsonResponse(200, { settings })
   } catch (err) {
     console.error('adminUpdateSettings error:', err)

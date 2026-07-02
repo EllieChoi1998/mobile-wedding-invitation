@@ -1,5 +1,10 @@
 <template>
   <section class="guestbook section section--accent">
+    <SectionCornerPatterns
+      :show-bottom-left="false"
+      top-right-placement="header"
+      top-right-flower="1"
+    />
     <SectionHeader :eyebrow="t.guestbook.eyebrow" :title="t.guestbook.title" />
 
     <form class="guestbook__form" @submit.prevent="onSubmit">
@@ -43,41 +48,36 @@
       <button type="submit" class="btn-primary guestbook__submit" :disabled="submitting">
         {{ submitting ? t.guestbook.submitting : t.guestbook.submit }}
       </button>
+      <button type="button" class="btn-outline guestbook__view" @click="openViewModal">
+        {{ t.guestbook.viewOpen }}
+      </button>
       <p v-if="error" class="guestbook__msg guestbook__msg--error">{{ error }}</p>
       <p v-if="success" class="guestbook__msg guestbook__msg--success">{{ t.guestbook.success }}</p>
     </form>
 
-    <div v-if="loading" class="guestbook__status">{{ t.guestbook.loading }}</div>
-    <div v-else-if="loadError" class="guestbook__msg guestbook__msg--error">{{ loadError }}</div>
-    <ul v-else class="guestbook__list">
-      <li v-for="entry in visibleMessages" :key="entry.messageId" class="guestbook__entry">
-        <p class="guestbook__from">{{ t.guestbook.from }}</p>
-        <p class="guestbook__author">{{ entry.authorName }}</p>
-        <p class="guestbook__text">{{ entry.message }}</p>
-        <time class="guestbook__date">{{ formatDate(entry.createdAt) }}</time>
-      </li>
-    </ul>
-    <p v-if="!loading && !loadError && messages.length === 0" class="guestbook__status">
-      {{ t.guestbook.empty }}
-    </p>
-    <button
-      v-if="messages.length > initialCount"
-      type="button"
-      class="btn-text guestbook__more"
-      @click="showAll = !showAll"
-    >
-      {{ showAll ? t.interview.showLess : t.guestbook.showMore }}
-    </button>
+    <GuestbookViewModal
+      :open="viewModalOpen"
+      :messages="messages"
+      :loading="loading"
+      :load-error="loadError"
+      @close="viewModalOpen = false"
+    />
   </section>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { listGuestbook, submitGuestbook } from '../api/guestbook'
+import { useAppStatus } from '../composables/useAppStatus'
 import { useInvitationContent } from '../composables/useInvitationContent'
+import { useSubmissionClosedToast } from '../composables/useSubmissionClosedToast'
+import GuestbookViewModal from './GuestbookViewModal.vue'
+import SectionCornerPatterns from './SectionCornerPatterns.vue'
 import SectionHeader from './SectionHeader.vue'
 
 const { t } = useInvitationContent()
+const { isGuestbookOpen } = useAppStatus()
+const { show: showClosedToast } = useSubmissionClosedToast()
 
 const authorName = ref('')
 const message = ref('')
@@ -89,17 +89,7 @@ const success = ref(false)
 const messages = ref([])
 const loading = ref(false)
 const loadError = ref('')
-const showAll = ref(false)
-const initialCount = 3
-
-const visibleMessages = computed(() =>
-  showAll.value ? messages.value : messages.value.slice(0, initialCount),
-)
-
-function formatDate(iso) {
-  const d = new Date(iso)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-}
+const viewModalOpen = ref(false)
 
 async function fetchMessages() {
   loading.value = true
@@ -115,7 +105,17 @@ async function fetchMessages() {
   }
 }
 
+function openViewModal() {
+  viewModalOpen.value = true
+  fetchMessages()
+}
+
 async function onSubmit() {
+  if (!isGuestbookOpen.value) {
+    showClosedToast(t.value.common.submissionClosed)
+    return
+  }
+
   submitting.value = true
   error.value = ''
   success.value = false
@@ -136,16 +136,20 @@ async function onSubmit() {
     submitting.value = false
   }
 }
-
-onMounted(fetchMessages)
 </script>
 
 <style scoped>
+.guestbook :deep(.section-corner-patterns__tr) {
+  top: calc(4.75rem - 80px);
+  right: calc(-0.5rem + 300px);
+  transform: scale(0.8);
+  transform-origin: top right;
+}
+
 .guestbook__form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-bottom: 2rem;
   padding: 1.25rem;
   border-radius: 14px;
   background: #fff;
@@ -211,50 +215,8 @@ onMounted(fetchMessages)
   width: 100%;
 }
 
-.guestbook__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.guestbook__entry {
-  padding: 1.125rem 1.25rem;
-  border-radius: 12px;
-  background: #fff;
-}
-
-.guestbook__from {
-  margin: 0 0 0.125rem;
-  font-size: 0.6875rem;
-  color: var(--color-text-muted);
-}
-
-.guestbook__author {
-  margin: 0 0 0.5rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: var(--color-text);
-}
-
-.guestbook__text {
-  margin: 0 0 0.5rem;
-  font-size: 0.8125rem;
-  line-height: 1.7;
-  color: var(--color-text-muted);
-}
-
-.guestbook__date {
-  font-size: 0.6875rem;
-  color: var(--color-text-muted);
-}
-
-.guestbook__status {
-  text-align: center;
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
+.guestbook__view {
+  width: 100%;
 }
 
 .guestbook__msg {
@@ -265,9 +227,4 @@ onMounted(fetchMessages)
 
 .guestbook__msg--error { color: #c0392b; }
 .guestbook__msg--success { color: var(--color-primary-dark); }
-
-.guestbook__more {
-  display: block;
-  margin: 1.25rem auto 0;
-}
 </style>

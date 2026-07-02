@@ -1,5 +1,6 @@
 <template>
   <section class="gallery section section--white">
+    <FloatingPetals section="gallery" />
     <SectionHeader :eyebrow="t.gallery.eyebrow" :title="t.gallery.title" />
 
     <div v-if="photos.length === 0" class="gallery__empty">
@@ -95,6 +96,7 @@ import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useWeddingPhotos } from '../composables/useWeddingPhotos'
 import { useInvitationContent } from '../composables/useInvitationContent'
 import { usePinchZoom } from '../composables/usePinchZoom'
+import FloatingPetals from './FloatingPetals.vue'
 import SectionHeader from './SectionHeader.vue'
 
 const { photos } = useWeddingPhotos()
@@ -214,6 +216,11 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.gallery :deep(.section__head) {
+  position: relative;
+  z-index: 1;
+}
+
 .gallery__empty {
   border-radius: 12px;
   overflow: hidden;

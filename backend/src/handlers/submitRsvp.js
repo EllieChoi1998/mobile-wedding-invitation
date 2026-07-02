@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
+import { getRsvpOpen } from '../lib/settings.js'
 
 const VALID_SIDES = ['groom', 'bride']
 
@@ -36,6 +37,11 @@ export async function handler(event) {
     }
     if (typeof attending !== 'boolean') {
       return jsonResponse(400, { message: 'attending must be a boolean' })
+    }
+
+    const rsvpOpen = await getRsvpOpen()
+    if (!rsvpOpen) {
+      return jsonResponse(403, { message: 'RSVP submission is closed' })
     }
 
     const rsvpId = randomUUID()

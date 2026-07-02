@@ -1,5 +1,7 @@
 <template>
   <header class="cover-hero section section--accent">
+    <SectionCornerPatterns />
+    <LineArtDecor variant="cover-bottom-left" />
     <CoverSplashBlock variant="section" />
 
     <div class="cover-hero__content">
@@ -17,8 +19,10 @@
 import { ref } from 'vue'
 import { useInvitationContent } from '../composables/useInvitationContent'
 import CoverSplashBlock from './CoverSplashBlock.vue'
+import LineArtDecor from './LineArtDecor.vue'
 import ParentsLine from './ParentsLine.vue'
 import ContactModal from './ContactModal.vue'
+import SectionCornerPatterns from './SectionCornerPatterns.vue'
 
 const { wedding, t } = useInvitationContent()
 const contactOpen = ref(false)
@@ -30,6 +34,13 @@ const contactOpen = ref(false)
   padding-right: 0;
   padding-top: 0;
   padding-bottom: 2.5rem;
+}
+
+.cover-hero :deep(.section-corner-patterns__bl) {
+  left: calc(-0.5rem + 30px);
+  bottom: calc(-0.5rem + 20px);
+  transform: scale(0.5) rotate(-18deg);
+  transform-origin: bottom left;
 }
 
 .cover-hero__content {

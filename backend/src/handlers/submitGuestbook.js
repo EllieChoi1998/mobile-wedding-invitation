@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
+import { getGuestbookOpen } from '../lib/settings.js'
 
 const VALID_SIDES = ['groom', 'bride']
 
@@ -36,6 +37,11 @@ export async function handler(event) {
     }
     if (side !== undefined && side !== null && side !== '' && !VALID_SIDES.includes(side)) {
       return jsonResponse(400, { message: 'side must be groom or bride when provided' })
+    }
+
+    const guestbookOpen = await getGuestbookOpen()
+    if (!guestbookOpen) {
+      return jsonResponse(403, { message: 'Guestbook submission is closed' })
     }
 
     const messageId = randomUUID()

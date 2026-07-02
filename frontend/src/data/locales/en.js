@@ -17,6 +17,9 @@ export default {
   langKo: '한국어',
   langEn: 'English',
   langNavLabel: 'Language',
+  common: {
+    submissionClosed: 'The wedding has ended. Submissions are no longer accepted.',
+  },
   cover: {
     eyebrow: 'Invitation',
     title: 'We invite you to celebrate with us',
@@ -139,9 +142,13 @@ export default {
     success: 'Thank you! Your message has been posted.',
     error: 'Something went wrong. Please try again.',
     empty: 'No messages yet.',
+    emptyModal: 'No messages have been posted yet.',
     loading: 'Loading...',
     loadError: 'Could not load guestbook.',
     showMore: 'Show more',
+    showLess: 'Show less',
+    viewOpen: 'View guestbook',
+    close: 'Close',
     from: 'from.',
   },
   account: {
@@ -215,6 +222,7 @@ export default {
     copyright: 'All rights reserved',
     createdBy: 'Created by',
     builtOn: 'Built',
+    illustrationCredit: 'Illustration',
   },
   pageTitle: 'Wedding Invitation',
 }

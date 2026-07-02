@@ -94,9 +94,43 @@
               class="admin__toggle"
               :class="{ 'admin__toggle--on': data.settings.photoUploadOpen }"
               :disabled="settingsUpdating"
-              @click="togglePhotoUpload"
+              @click="toggleSetting('photoUploadOpen')"
             >
               {{ settingsUpdating ? '…' : data.settings.photoUploadOpen ? '허용 중' : '차단 중' }}
+            </button>
+          </div>
+          <div class="admin__settings-row">
+            <div>
+              <p class="admin__settings-label">방명록 작성</p>
+              <p class="admin__settings-desc">
+                {{ data.settings.guestbookOpen ? '하객이 방명록을 작성할 수 있습니다.' : '작성이 차단되어 있습니다.' }}
+              </p>
+            </div>
+            <button
+              type="button"
+              class="admin__toggle"
+              :class="{ 'admin__toggle--on': data.settings.guestbookOpen }"
+              :disabled="settingsUpdating"
+              @click="toggleSetting('guestbookOpen')"
+            >
+              {{ settingsUpdating ? '…' : data.settings.guestbookOpen ? '허용 중' : '차단 중' }}
+            </button>
+          </div>
+          <div class="admin__settings-row">
+            <div>
+              <p class="admin__settings-label">RSVP 참석 의사</p>
+              <p class="admin__settings-desc">
+                {{ data.settings.rsvpOpen ? '하객이 참석 의사를 전달할 수 있습니다.' : '전달이 차단되어 있습니다.' }}
+              </p>
+            </div>
+            <button
+              type="button"
+              class="admin__toggle"
+              :class="{ 'admin__toggle--on': data.settings.rsvpOpen }"
+              :disabled="settingsUpdating"
+              @click="toggleSetting('rsvpOpen')"
+            >
+              {{ settingsUpdating ? '…' : data.settings.rsvpOpen ? '허용 중' : '차단 중' }}
             </button>
           </div>
           <p v-if="settingsError" class="admin__error">{{ settingsError }}</p>
@@ -379,7 +413,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { deleteAdminItems, fetchAdminData, updatePhotoUploadSetting } from '../api/admin'
+import { deleteAdminItems, fetchAdminData, updateAppSettings } from '../api/admin'
 import { isApiConfigured } from '../api/client'
 
 const apiConfigured = isApiConfigured()
@@ -646,14 +680,14 @@ function formatDate(iso) {
   })
 }
 
-async function togglePhotoUpload() {
+async function toggleSetting(key) {
   if (!data.value?.settings) return
   settingsUpdating.value = true
   settingsError.value = ''
-  const next = !data.value.settings.photoUploadOpen
+  const next = !data.value.settings[key]
   try {
-    const result = await updatePhotoUploadSetting(storedPassword.value, next)
-    data.value.settings.photoUploadOpen = result.settings.photoUploadOpen
+    const result = await updateAppSettings(storedPassword.value, { [key]: next })
+    data.value.settings = { ...data.value.settings, ...result.settings }
   } catch (err) {
     settingsError.value = err.message || '설정 변경에 실패했습니다'
   } finally {
@@ -714,8 +748,11 @@ async function loadData(password, { silent = false } = {}) {
   loadError.value = ''
   try {
     data.value = await fetchAdminData(password)
-    if (!data.value.settings) {
-      data.value.settings = { photoUploadOpen: false }
+    data.value.settings = {
+      photoUploadOpen: false,
+      guestbookOpen: true,
+      rsvpOpen: true,
+      ...data.value.settings,
     }
     authenticated.value = true
     sessionStorage.setItem(STORAGE_KEY, password)
@@ -1021,6 +1058,12 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.admin__settings-row + .admin__settings-row {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
 }
 
 .admin__settings-label {

@@ -1,5 +1,6 @@
 <template>
   <section class="location section section--accent">
+    <SectionCornerPatterns />
     <SectionHeader :eyebrow="t.location.eyebrow" :title="t.location.title" />
 
     <div class="location__venue">
@@ -95,6 +96,7 @@ import { resolveAssetImage } from '../composables/useAssetImage'
 import { useInvitationContent } from '../composables/useInvitationContent'
 import { buildMapLinks } from '../utils/mapLinks'
 import VenueMap from './VenueMap.vue'
+import SectionCornerPatterns from './SectionCornerPatterns.vue'
 import SectionHeader from './SectionHeader.vue'
 
 const { wedding, t } = useInvitationContent()
@@ -223,6 +225,23 @@ async function copyAddress() {
 <style scoped>
 .location {
   text-align: center;
+}
+
+.location :deep(.section-corner-patterns__bl) {
+  top: calc(4.75rem - 20px);
+  bottom: auto;
+  left: auto;
+  right: calc(50% - 35px);
+  transform: scale(0.7);
+  transform-origin: right center;
+}
+
+.location :deep(.section-corner-patterns__tr) {
+  top: calc(4.75rem - 85px);
+  right: auto;
+  left: calc(50% - 85px);
+  transform: scale(1.092) rotate(15deg);
+  transform-origin: left center;
 }
 
 .location__venue {

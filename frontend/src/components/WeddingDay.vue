@@ -1,5 +1,6 @@
 <template>
   <section class="wedding-day section section--white">
+    <FloatingPetals section="wedding-day" />
     <SectionHeader :eyebrow="t.weddingDay.eyebrow" :title="t.weddingDay.title" />
 
     <dl class="wedding-day__info">
@@ -70,6 +71,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useInvitationContent } from '../composables/useInvitationContent'
+import FloatingPetals from './FloatingPetals.vue'
 import SectionHeader from './SectionHeader.vue'
 
 const { wedding, calendarLabel, weekdays, t } = useInvitationContent()

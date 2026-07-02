@@ -16,6 +16,7 @@
 
     <RsvpModal :open="rsvpPopupOpen" @close="rsvpPopupOpen = false" />
     <RsvpFloatingButton v-if="!rsvpPopupOpen" @open="rsvpPopupOpen = true" />
+    <SubmissionClosedToast />
   </div>
 </template>
 
@@ -36,6 +37,7 @@ import RsvpModal from '../components/RsvpModal.vue'
 import RsvpFloatingButton from '../components/RsvpFloatingButton.vue'
 import GuestGallery from '../components/GuestGallery.vue'
 import EndingSection from '../components/EndingSection.vue'
+import SubmissionClosedToast from '../components/SubmissionClosedToast.vue'
 
 const invitationReady = inject('invitationReady', ref(true))
 const rsvpPopupOpen = ref(false)

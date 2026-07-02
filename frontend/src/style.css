@@ -107,6 +107,15 @@
   --section-pad-y: 3.5rem;
   --section-pad-x: 1.5rem;
   --section-max-width: 480px;
+  --section-inner-width: calc(min(100vw, var(--section-max-width)) - 2 * var(--section-pad-x));
+  --section-gallery-strip-height: 5.25rem;
+  --section-gallery-body-height: calc(
+    var(--section-inner-width) * 3 / 4 + 0.75rem + var(--section-gallery-strip-height)
+  );
+  --section-gallery-head-height: 5.75rem;
+  --section-standard-min-height: calc(
+    2 * var(--section-pad-y) + var(--section-gallery-head-height) + var(--section-gallery-body-height)
+  );
   --font-body: 'MaruBuri', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-serif: 'MaruBuri', Georgia, serif;
   --hanji-texture-gradient: repeating-linear-gradient(
@@ -161,11 +170,24 @@
 }
 
 .section {
+  position: relative;
   padding: var(--section-pad-y) var(--section-pad-x);
+}
+
+/* 갤러리 섹션 높이를 기준으로 최소 높이만 맞춤 (커버·갤러리 컴포넌트는 변경 없음) */
+.invitation > .section:not(.cover-hero) {
+  min-height: var(--section-standard-min-height);
+  box-sizing: border-box;
 }
 
 .section--white {
   background: #fff;
+  isolation: isolate;
+}
+
+.section--white > :not(.section-corner-patterns):not(.floating-petals) {
+  position: relative;
+  z-index: 1;
 }
 
 .section--accent {

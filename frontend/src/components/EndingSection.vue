@@ -1,5 +1,7 @@
 <template>
   <footer class="ending section section--white">
+    <SectionCornerPatterns :show-top-right="false" />
+    <FloatingPetals section="ending" />
     <!--
     <div class="ending__photo">
       <ImageWithPlaceholder
@@ -43,7 +45,18 @@
         </template>
       </p>
       <p v-if="builtOnLabel" class="ending__credit-date">{{ t.ending.builtOn }} {{ builtOnLabel }}</p>
+      <p class="ending__illustrator-credit">
+        {{ t.ending.illustrationCredit }}
+        <a
+          class="ending__credit-link"
+          :href="illustrator.profileUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+        >@{{ illustrator.name }}</a>
+      </p>
     </div>
+
+    <LineArtDecor variant="ending-center" />
   </footer>
 </template>
 
@@ -52,9 +65,12 @@ import { computed, onMounted, ref } from 'vue'
 // import { resolveAssetImage } from '../composables/useAssetImage'
 import { useInvitationContent } from '../composables/useInvitationContent'
 import { useLocale } from '../composables/useLocale'
+import FloatingPetals from './FloatingPetals.vue'
+import LineArtDecor from './LineArtDecor.vue'
+import SectionCornerPatterns from './SectionCornerPatterns.vue'
 // import ImageWithPlaceholder from './ImageWithPlaceholder.vue'
 
-const { couple, share, creator, t } = useInvitationContent()
+const { couple, share, creator, illustrator, t } = useInvitationContent()
 const { locale } = useLocale()
 
 const kakaoReady = ref(false)
@@ -132,6 +148,12 @@ onMounted(loadKakaoSdk)
   padding-bottom: 3rem;
 }
 
+.ending :deep(.section-corner-patterns__bl) {
+  left: calc(-0.5rem + 33px);
+  transform: rotate(-20deg);
+  transform-origin: bottom left;
+}
+
 .ending__photo {
   width: 100%;
   aspect-ratio: 4 / 3;
@@ -198,6 +220,14 @@ onMounted(loadKakaoSdk)
 
 .ending__credit-date {
   margin-top: 0.25rem;
+}
+
+.ending__illustrator-credit {
+  margin: 0.25rem 0 0;
+  font-size: calc(0.625rem - 1px);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  opacity: 0.85;
 }
 
 .ending__credit-link {

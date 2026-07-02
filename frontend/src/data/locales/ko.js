@@ -17,6 +17,9 @@ export default {
   langKo: '한국어',
   langEn: 'English',
   langNavLabel: '언어 선택',
+  common: {
+    submissionClosed: '결혼식이 끝나서 더이상 제출하실 수 없습니다.',
+  },
   cover: {
     eyebrow: 'Invitation',
     title: '소중한 분들을 초대합니다',
@@ -139,9 +142,13 @@ export default {
     success: '방명록이 등록되었습니다. 감사합니다!',
     error: '등록에 실패했습니다. 다시 시도해 주세요.',
     empty: '아직 작성된 방명록이 없습니다.',
+    emptyModal: '아직 작성된 메시지가 없어요',
     loading: '불러오는 중...',
     loadError: '방명록을 불러오지 못했습니다.',
     showMore: '더보기',
+    showLess: '접기',
+    viewOpen: '방명록 구경하기',
+    close: '닫기',
     from: 'from.',
   },
   account: {
@@ -215,6 +222,7 @@ export default {
     copyright: 'All rights reserved',
     createdBy: '제작',
     builtOn: '제작일',
+    illustrationCredit: '일러스트',
   },
   pageTitle: '모바일 청첩장',
 }

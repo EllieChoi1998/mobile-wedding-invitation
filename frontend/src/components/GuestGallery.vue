@@ -1,35 +1,42 @@
 <template>
   <section class="guest-gallery section section--white">
-    <SectionHeader
-      :eyebrow="t.guestGallery.eyebrow"
-      :title="t.guestGallery.title"
-      :desc="t.guestGallery.desc"
-    />
+    <FloatingPetals section="guest-gallery" />
+    <div class="guest-gallery__top">
+      <div class="section__divider" />
+      <p class="section__eyebrow">{{ t.guestGallery.eyebrow }}</p>
+    </div>
 
-    <div class="guest-gallery__upload">
-      <p v-if="uploadStatusLoading" class="guest-gallery__status">{{ t.guestGallery.statusLoading }}</p>
-      <template v-else-if="isUploadOpen">
-        <label class="guest-gallery__upload-label btn-outline">
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            class="guest-gallery__file-input"
-            :disabled="uploading"
-            @change="onFilesSelected"
-          />
-          {{ uploadButtonLabel }}
-        </label>
-        <p v-if="uploadProgress" class="guest-gallery__progress">
-          {{ uploadProgressLabel }}
-        </p>
-        <p v-if="uploadError" class="guest-gallery__message guest-gallery__message--error">{{ uploadError }}</p>
-        <p v-if="uploadSuccess" class="guest-gallery__message guest-gallery__message--success">
-          {{ uploadSuccessLabel }}
-        </p>
-        <p class="guest-gallery__note">{{ t.guestGallery.uploadNote }}</p>
-      </template>
-      <p v-else class="guest-gallery__closed">{{ t.guestGallery.uploadClosed }}</p>
+    <div class="guest-gallery__body">
+      <div class="guest-gallery__inner">
+        <h2 class="section__title">{{ t.guestGallery.title }}</h2>
+        <p class="section__desc">{{ t.guestGallery.desc }}</p>
+
+        <div class="guest-gallery__upload">
+          <p v-if="uploadStatusLoading" class="guest-gallery__status">{{ t.guestGallery.statusLoading }}</p>
+          <template v-else-if="isUploadOpen">
+            <label class="guest-gallery__upload-label btn-outline">
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                class="guest-gallery__file-input"
+                :disabled="uploading"
+                @change="onFilesSelected"
+              />
+              {{ uploadButtonLabel }}
+            </label>
+            <p v-if="uploadProgress" class="guest-gallery__progress">
+              {{ uploadProgressLabel }}
+            </p>
+            <p v-if="uploadError" class="guest-gallery__message guest-gallery__message--error">{{ uploadError }}</p>
+            <p v-if="uploadSuccess" class="guest-gallery__message guest-gallery__message--success">
+              {{ uploadSuccessLabel }}
+            </p>
+            <p class="guest-gallery__note">{{ t.guestGallery.uploadNote }}</p>
+          </template>
+          <p v-else class="guest-gallery__closed">{{ t.guestGallery.uploadClosed }}</p>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -37,14 +44,14 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useLocale } from '../composables/useLocale'
-import { useGuestPhotoUpload } from '../composables/useGuestPhotoUpload'
+import { useAppStatus } from '../composables/useAppStatus'
 import { requestPresignedUrl, uploadToS3 } from '../api/photos'
-import SectionHeader from './SectionHeader.vue'
 import { useSide } from '../composables/useSide'
+import FloatingPetals from './FloatingPetals.vue'
 
 const { side } = useSide()
 const { t } = useLocale()
-const { isUploadOpen, statusLoading: uploadStatusLoading } = useGuestPhotoUpload()
+const { isUploadOpen, statusLoading: uploadStatusLoading } = useAppStatus()
 
 const uploading = ref(false)
 const uploadError = ref('')
@@ -112,8 +119,38 @@ async function onFilesSelected(event) {
 </script>
 
 <style scoped>
+.guest-gallery {
+  display: flex;
+  flex-direction: column;
+}
+
+.guest-gallery__top {
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.guest-gallery__body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.guest-gallery__inner {
+  width: 100%;
+  text-align: center;
+}
+
+.guest-gallery__inner .section__title {
+  margin-bottom: 0.5rem;
+}
+
+.guest-gallery__inner .section__desc {
+  margin-bottom: 1.25rem;
+}
+
 .guest-gallery__upload {
-  margin-bottom: 1.75rem;
   text-align: center;
 }
 

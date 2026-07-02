@@ -1,5 +1,6 @@
 <template>
   <section class="information section section--white">
+    <FloatingPetals section="information" />
     <SectionHeader :eyebrow="t.information.eyebrow" :title="t.information.title" />
 
     <div v-if="side === 'groom'" class="information__notice hanji-card">
@@ -44,6 +45,7 @@
 <script setup>
 import { useLocale } from '../composables/useLocale'
 import { useSide } from '../composables/useSide'
+import FloatingPetals from './FloatingPetals.vue'
 import SectionHeader from './SectionHeader.vue'
 
 const { t } = useLocale()

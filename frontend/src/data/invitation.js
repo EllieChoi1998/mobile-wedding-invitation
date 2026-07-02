@@ -223,6 +223,13 @@ export const share = {
   defaultMessage: '저희 결혼식에 초대합니다',
 }
 
+/** 일러스트 크레딧 — 마지막 섹션 표시용 */
+export const illustrator = {
+  name: '문아현',
+  handle: 'mnahyunn',
+  profileUrl: 'https://www.instagram.com/mnahyunn/',
+}
+
 /** 청첩장 제작자 크레딧 — 하단 표시용 (email은 본인 주소로 수정) */
 export const creator = {
   handle: 'EllieChoi1998',

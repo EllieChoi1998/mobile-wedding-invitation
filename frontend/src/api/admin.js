@@ -48,7 +48,7 @@ export async function deleteAdminItems(adminPassword, deletePassword, items) {
   return parseJsonResponse(response)
 }
 
-export async function updatePhotoUploadSetting(adminPassword, photoUploadOpen) {
+export async function updateAppSettings(adminPassword, settings) {
   const apiBaseUrl = getApiBaseUrl()
   if (!apiBaseUrl) {
     throw new Error(API_MISCONFIG_MESSAGE)
@@ -60,7 +60,7 @@ export async function updatePhotoUploadSetting(adminPassword, photoUploadOpen) {
       'Content-Type': 'application/json',
       'X-Admin-Password': adminPassword,
     },
-    body: JSON.stringify({ photoUploadOpen }),
+    body: JSON.stringify(settings),
   })
 
   if (response.status === 401) {
@@ -72,4 +72,9 @@ export async function updatePhotoUploadSetting(adminPassword, photoUploadOpen) {
   }
 
   return parseJsonResponse(response)
+}
+
+/** @deprecated Use updateAppSettings */
+export async function updatePhotoUploadSetting(adminPassword, photoUploadOpen) {
+  return updateAppSettings(adminPassword, { photoUploadOpen })
 }

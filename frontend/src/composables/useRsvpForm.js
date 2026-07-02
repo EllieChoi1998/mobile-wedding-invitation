@@ -1,11 +1,15 @@
 import { ref, watch, onUnmounted } from 'vue'
 import { submitRsvp } from '../api/rsvp'
+import { useAppStatus } from './useAppStatus'
 import { useLocale } from './useLocale'
 import { useSide } from './useSide'
+import { useSubmissionClosedToast } from './useSubmissionClosedToast'
 
 export function useRsvpForm() {
   const { t } = useLocale()
   const { side: pageSide } = useSide()
+  const { isRsvpOpen } = useAppStatus()
+  const { show: showClosedToast } = useSubmissionClosedToast()
 
   const guestName = ref('')
   const rsvpSide = ref('')
@@ -52,6 +56,11 @@ export function useRsvpForm() {
     const validation = getValidationMessage()
     if (validation) {
       showValidation(validation)
+      return
+    }
+
+    if (!isRsvpOpen.value) {
+      showClosedToast(t.value.common.submissionClosed)
       return
     }
 

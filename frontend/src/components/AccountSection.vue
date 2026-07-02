@@ -1,5 +1,6 @@
 <template>
   <section class="account section section--accent">
+    <SectionCornerPatterns />
     <SectionHeader
       :eyebrow="t.account.eyebrow"
       :title="t.account.title"
@@ -43,6 +44,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useInvitationContent } from '../composables/useInvitationContent'
+import SectionCornerPatterns from './SectionCornerPatterns.vue'
 import SectionHeader from './SectionHeader.vue'
 
 const { accounts, side, t } = useInvitationContent()
@@ -74,6 +76,22 @@ async function copyAccount(item, index) {
 </script>
 
 <style scoped>
+.account :deep(.section-corner-patterns) {
+  z-index: 10;
+}
+
+.account :deep(.section-corner-patterns__tr) {
+  right: calc(-0.5rem + 150px);
+}
+
+.account :deep(.section-corner-patterns__bl) {
+  left: calc(-0.5rem + 250px);
+  bottom: calc(-0.5rem + 20px);
+  z-index: 2;
+  transform: scale(0.7);
+  transform-origin: bottom left;
+}
+
 .account__tabs {
   display: flex;
   gap: 0.5rem;

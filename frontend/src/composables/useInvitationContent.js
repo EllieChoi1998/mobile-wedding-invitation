@@ -12,6 +12,7 @@ import {
   wedding as weddingMeta,
   share,
   creator,
+  illustrator,
   getInvitationBySide,
 } from '../data/invitation'
 import { useSide } from './useSide'
@@ -81,6 +82,7 @@ export function useInvitationContent() {
     cover,
     share,
     creator,
+    illustrator,
     wedding,
     sideInfo,
     calendarLabel,
