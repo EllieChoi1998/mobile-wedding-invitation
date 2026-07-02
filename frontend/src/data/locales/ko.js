@@ -110,6 +110,21 @@ export default {
     eyebrow: 'Information',
     title: '안내사항',
     flowerNotice: '축하 화환은 정중히 사양합니다.\n마음만 감사히 받겠습니다.',
+    bride: {
+      waitingRoom: {
+        title: '신부대기실 위치',
+        body: '5층 웨딩홀 입구 기준, 왼쪽 복도 끝에 위치해 있습니다. 신부와 함께 소중한 추억을 사진으로 남겨주세요.',
+      },
+      banquet: {
+        title: '연회장 안내',
+        floors: [
+          { floor: '2층 (서브 연회장)', note: '예식 시작 30분 후부터 식사 가능' },
+          { floor: '3층 (메인 연회장)', note: '본식 종료 후부터 식사 가능' },
+        ],
+        footer:
+          '하객 여러분의 편의를 위해 시간대별로 연회장이 다르게 운영되오니 참고 부탁드립니다.',
+      },
+    },
   },
   guestbook: {
     eyebrow: 'Guestbook',

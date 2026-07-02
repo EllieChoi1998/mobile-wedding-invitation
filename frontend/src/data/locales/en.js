@@ -110,6 +110,21 @@ export default {
     eyebrow: 'Information',
     title: 'Notice',
     flowerNotice: 'We kindly ask that floral wreaths not be sent.\nYour warm wishes mean the world to us.',
+    bride: {
+      waitingRoom: {
+        title: "Bride's Waiting Room",
+        body: 'From the 5th-floor wedding hall entrance, walk to the end of the corridor on the left. Please capture precious memories in photos with the bride.',
+      },
+      banquet: {
+        title: 'Banquet Halls',
+        floors: [
+          { floor: '2F (Sub Banquet Hall)', note: 'Dining available 30 minutes after the ceremony begins' },
+          { floor: '3F (Main Banquet Hall)', note: 'Dining available after the ceremony ends' },
+        ],
+        footer:
+          'Banquet halls operate on different schedules for your convenience. Thank you for your understanding.',
+      },
+    },
   },
   guestbook: {
     eyebrow: 'Guestbook',
