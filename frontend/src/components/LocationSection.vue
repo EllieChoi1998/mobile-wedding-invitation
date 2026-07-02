@@ -228,18 +228,18 @@ async function copyAddress() {
 }
 
 .location :deep(.section-corner-patterns__bl) {
-  top: calc(4.75rem - 20px);
+  top: calc(4.75rem * var(--inv-ratio) - 20px * var(--inv-ratio));
   bottom: auto;
   left: auto;
-  right: calc(50% - 35px);
+  right: calc(50% - 35px * var(--inv-ratio));
   transform: scale(0.7);
   transform-origin: right center;
 }
 
 .location :deep(.section-corner-patterns__tr) {
-  top: calc(4.75rem - 85px);
+  top: calc(4.75rem * var(--inv-ratio) - 85px * var(--inv-ratio));
   right: auto;
-  left: calc(50% - 85px);
+  left: calc(50% - 85px * var(--inv-ratio));
   transform: scale(1.092) rotate(15deg);
   transform-origin: left center;
 }

@@ -149,7 +149,7 @@ onMounted(loadKakaoSdk)
 }
 
 .ending :deep(.section-corner-patterns__bl) {
-  left: calc(-0.5rem + 33px);
+  left: calc(-0.5rem * var(--inv-ratio) + 33px * var(--inv-ratio));
   transform: rotate(-20deg);
   transform-origin: bottom left;
 }
@@ -224,7 +224,7 @@ onMounted(loadKakaoSdk)
 
 .ending__illustrator-credit {
   margin: 0.25rem 0 0;
-  font-size: calc(0.625rem - 1px);
+  font-size: calc(0.625rem - 1px * var(--inv-ratio));
   line-height: 1.6;
   color: var(--color-text-muted);
   opacity: 0.85;

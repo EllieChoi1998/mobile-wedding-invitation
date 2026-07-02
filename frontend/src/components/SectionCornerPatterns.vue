@@ -46,22 +46,22 @@ const flowerBottomLeft = flower1
 
 .section-corner-patterns__tr {
   position: absolute;
-  top: -0.25rem;
-  right: -0.5rem;
-  width: 14.25rem;
+  top: calc(-0.25rem * var(--inv-ratio));
+  right: calc(-0.5rem * var(--inv-ratio));
+  width: calc(14.25rem * var(--inv-ratio));
   max-width: 96%;
   opacity: 0.9;
 }
 
 .section-corner-patterns__tr--header {
-  top: 4.75rem;
+  top: calc(4.75rem * var(--inv-ratio));
 }
 
 .section-corner-patterns__bl {
   position: absolute;
-  bottom: -0.25rem;
-  left: -0.5rem;
-  width: 12.75rem;
+  bottom: calc(-0.25rem * var(--inv-ratio));
+  left: calc(-0.5rem * var(--inv-ratio));
+  width: calc(12.75rem * var(--inv-ratio));
   max-width: 90%;
   opacity: 0.9;
 }

@@ -81,12 +81,12 @@ async function copyAccount(item, index) {
 }
 
 .account :deep(.section-corner-patterns__tr) {
-  right: calc(-0.5rem + 150px);
+  right: calc(-0.5rem * var(--inv-ratio) + 150px * var(--inv-ratio));
 }
 
 .account :deep(.section-corner-patterns__bl) {
-  left: calc(-0.5rem + 250px);
-  bottom: calc(-0.5rem + 20px);
+  left: calc(-0.5rem * var(--inv-ratio) + 250px * var(--inv-ratio));
+  bottom: calc(-0.5rem * var(--inv-ratio) + 20px * var(--inv-ratio));
   z-index: 2;
   transform: scale(0.7);
   transform-origin: bottom left;

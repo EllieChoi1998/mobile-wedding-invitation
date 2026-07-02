@@ -37,8 +37,8 @@ const contactOpen = ref(false)
 }
 
 .cover-hero :deep(.section-corner-patterns__bl) {
-  left: calc(-0.5rem + 30px);
-  bottom: calc(-0.5rem + 20px);
+  left: calc(-0.5rem * var(--inv-ratio) + 30px * var(--inv-ratio));
+  bottom: calc(-0.5rem * var(--inv-ratio) + 20px * var(--inv-ratio));
   transform: scale(0.5) rotate(-18deg);
   transform-origin: bottom left;
 }

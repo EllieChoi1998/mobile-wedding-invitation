@@ -107,6 +107,8 @@
   --section-pad-y: 3.5rem;
   --section-pad-x: 1.5rem;
   --section-max-width: 480px;
+  /* Scale decorative offsets from 480px design width (unitless) */
+  --inv-ratio: calc(min(100vw, var(--section-max-width)) / var(--section-max-width));
   --section-inner-width: calc(min(100vw, var(--section-max-width)) - 2 * var(--section-pad-x));
   --section-gallery-strip-height: 5.25rem;
   --section-gallery-body-height: calc(

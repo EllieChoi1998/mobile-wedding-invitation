@@ -28,9 +28,9 @@ defineProps({
 .line-art-decor--cover-bottom-left {
   position: absolute;
   bottom: 0.5rem;
-  left: -123px;
+  left: calc(-123px * var(--inv-ratio));
   z-index: 10000;
-  width: 49.5rem;
+  width: calc(49.5rem * var(--inv-ratio));
   max-width: 100%;
   transform: scale(1.1);
   transform-origin: bottom left;
@@ -39,11 +39,11 @@ defineProps({
 
 .line-art-decor--ending-center {
   position: absolute;
-  bottom: calc(0.5rem - 50px);
-  left: calc(50% - 20px);
+  bottom: calc(0.5rem - 50px * var(--inv-ratio));
+  left: calc(50% - 20px * var(--inv-ratio));
   transform: translateX(-50%) scale(2.25);
   transform-origin: bottom center;
-  width: 54rem;
+  width: calc(54rem * var(--inv-ratio));
   max-width: 90%;
   opacity: 0.85;
   z-index: 0;

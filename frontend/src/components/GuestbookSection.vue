@@ -140,8 +140,8 @@ async function onSubmit() {
 
 <style scoped>
 .guestbook :deep(.section-corner-patterns__tr) {
-  top: calc(4.75rem - 80px);
-  right: calc(-0.5rem + 300px);
+  top: calc(4.75rem * var(--inv-ratio) - 80px * var(--inv-ratio));
+  right: calc(-0.5rem * var(--inv-ratio) + 300px * var(--inv-ratio));
   transform: scale(0.8);
   transform-origin: top right;
 }

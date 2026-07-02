@@ -13,6 +13,7 @@
 
 <script setup>
 import petalSrc from '../assets/patterns/꽃잎1.png'
+import { rpx } from '../utils/responsiveLayout'
 
 const props = defineProps({
   section: {
@@ -69,10 +70,10 @@ function petalStyle(petal) {
   const sizeScale = petal.sizeScale ?? 1
 
   return {
-    top: petal.top,
-    left: petal.left,
-    right: petal.right,
-    width: `${widthValue * PETAL_SCALE * sizeScale}${unit}`,
+    top: rpx(petal.top),
+    left: rpx(petal.left),
+    right: rpx(petal.right),
+    width: `calc(${widthValue * PETAL_SCALE * sizeScale}rem * var(--inv-ratio))`,
     transform: transforms.join(' '),
     opacity: petal.opacity,
   }
