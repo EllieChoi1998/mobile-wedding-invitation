@@ -7,14 +7,16 @@
 
     <div class="cover-splash__text">
       <p class="cover-splash__names">
-        {{ couple.groom.fullName }}
+        <LocalizedName :korean="couple.groom.fullName" :english="couple.groom.englishName" />
         <span class="cover-splash__heart">♥</span>
-        {{ couple.bride.fullName }}
+        <LocalizedName :korean="couple.bride.fullName" :english="couple.bride.englishName" />
       </p>
       <p class="cover-splash__datetime">
         {{ wedding.date }}({{ wedding.dayNote }}) {{ wedding.time }}
       </p>
-      <p class="cover-splash__venue">{{ wedding.venue }}</p>
+      <p class="cover-splash__venue">
+        <LocalizedName block :korean="wedding.venue" :english="wedding.venueEnglish" />
+      </p>
     </div>
   </div>
 </template>
@@ -22,6 +24,7 @@
 <script setup>
 import { useInvitationContent } from '../composables/useInvitationContent'
 import { useSplashImage } from '../composables/useSplashImage'
+import LocalizedName from './LocalizedName.vue'
 
 defineProps({
   variant: {

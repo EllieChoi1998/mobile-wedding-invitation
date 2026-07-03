@@ -33,9 +33,12 @@ export function useInvitationContent() {
     dayNote: t.value.wedding.dayNote,
     time: t.value.wedding.time,
     venue: weddingMeta.venue,
-    hall: weddingMeta.hall,
+    hall: isEnglish.value ? t.value.venue?.hall ?? weddingMeta.hall : weddingMeta.hall,
+    venueEnglish: isEnglish.value ? t.value.venue?.venueEn ?? '' : '',
     address: weddingMeta.address,
+    addressEnglish: isEnglish.value ? t.value.venue?.addressEn ?? '' : '',
     addressCopy: weddingMeta.addressCopy,
+    addressCopyEnglish: isEnglish.value ? t.value.venue?.addressCopyEn ?? '' : '',
     greeting: t.value.wedding.greeting,
     calendar: weddingMeta.calendar,
     dateISO: weddingMeta.dateISO,
@@ -50,6 +53,7 @@ export function useInvitationContent() {
   const localizedCouple = computed(() => ({
     groom: {
       ...couple.groom,
+      englishName: isEnglish.value ? t.value.names?.groom ?? '' : '',
       birthDate:
         isEnglish.value && t.value.couple?.groom?.birthDate
           ? t.value.couple.groom.birthDate
@@ -61,6 +65,7 @@ export function useInvitationContent() {
     },
     bride: {
       ...couple.bride,
+      englishName: isEnglish.value ? t.value.names?.bride ?? '' : '',
       birthDate:
         isEnglish.value && t.value.couple?.bride?.birthDate
           ? t.value.couple.bride.birthDate
@@ -72,6 +77,19 @@ export function useInvitationContent() {
     },
   }))
 
+  const localizedParentsLine = computed(() => ({
+    groom: {
+      ...parentsLine.groom,
+      fatherEnglish: isEnglish.value ? t.value.names?.groomFather ?? '' : '',
+      motherEnglish: isEnglish.value ? t.value.names?.groomMother ?? '' : '',
+    },
+    bride: {
+      ...parentsLine.bride,
+      fatherEnglish: isEnglish.value ? t.value.names?.brideFather ?? '' : '',
+      motherEnglish: isEnglish.value ? t.value.names?.brideMother ?? '' : '',
+    },
+  }))
+
   const localizedTimeline = computed(() =>
     isEnglish.value && t.value.timeline.items ? t.value.timeline.items : timeline,
   )
@@ -80,10 +98,12 @@ export function useInvitationContent() {
     groomSide: accounts.groomSide.map((item, index) => ({
       ...item,
       label: t.value.account.roleLabels?.[ACCOUNT_ROLE_KEYS.groomSide[index]] ?? item.label,
+      englishName: isEnglish.value ? t.value.names?.[ACCOUNT_ROLE_KEYS.groomSide[index]] ?? '' : '',
     })),
     brideSide: accounts.brideSide.map((item, index) => ({
       ...item,
       label: t.value.account.roleLabels?.[ACCOUNT_ROLE_KEYS.brideSide[index]] ?? item.label,
+      englishName: isEnglish.value ? t.value.names?.[ACCOUNT_ROLE_KEYS.brideSide[index]] ?? '' : '',
     })),
   }))
 
@@ -118,13 +138,14 @@ export function useInvitationContent() {
     contacts.map((contact) => ({
       ...contact,
       role: t.value.contactRoles[contact.roleKey],
+      englishName: isEnglish.value ? t.value.names?.[contact.roleKey] ?? '' : '',
     })),
   )
 
   return {
     couple: localizedCouple,
     parents,
-    parentsLine,
+    parentsLine: localizedParentsLine,
     contacts: localizedContacts,
     timeline: localizedTimeline,
     relationship,

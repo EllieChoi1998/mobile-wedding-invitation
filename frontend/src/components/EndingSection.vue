@@ -14,9 +14,9 @@
 
     <p class="ending__message">{{ t.ending.title }}</p>
     <p class="ending__names">
-      {{ couple.groom.fullName }}
+      <LocalizedName :korean="couple.groom.fullName" :english="couple.groom.englishName" />
       <span class="ending__amp">&amp;</span>
-      {{ couple.bride.fullName }}
+      <LocalizedName :korean="couple.bride.fullName" :english="couple.bride.englishName" />
     </p>
 
     <div class="ending__share">
@@ -67,6 +67,7 @@ import { useInvitationContent } from '../composables/useInvitationContent'
 import { useLocale } from '../composables/useLocale'
 import FloatingPetals from './FloatingPetals.vue'
 import LineArtDecor from './LineArtDecor.vue'
+import LocalizedName from './LocalizedName.vue'
 import SectionCornerPatterns from './SectionCornerPatterns.vue'
 // import ImageWithPlaceholder from './ImageWithPlaceholder.vue'
 

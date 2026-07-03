@@ -35,7 +35,12 @@
       >
         <div class="account__info">
           <span class="account__label">{{ item.label }}</span>
-          <span class="account__name">{{ item.name }}</span>
+          <LocalizedName
+            class="account__name"
+            block
+            :korean="item.name"
+            :english="item.englishName"
+          />
           <span
             :ref="(el) => setMotherRef('account', index, el)"
             class="account__bank"
@@ -59,6 +64,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useInvitationContent } from '../composables/useInvitationContent'
 import SectionCornerPatterns from './SectionCornerPatterns.vue'
 import SectionHeader from './SectionHeader.vue'
+import LocalizedName from './LocalizedName.vue'
 
 const MOTHER_INDEX = 2
 /** 480px 기준 미세 조정 — inv-ratio로 스케일 */
@@ -239,6 +245,10 @@ async function copyAccount(item, index) {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-text);
+}
+
+.account__name :deep(.localized-name__en) {
+  font-size: 0.6875rem;
 }
 
 .account__bank {

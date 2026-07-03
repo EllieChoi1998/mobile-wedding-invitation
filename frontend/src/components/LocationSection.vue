@@ -4,10 +4,12 @@
     <SectionHeader :eyebrow="t.location.eyebrow" :title="t.location.title" />
 
     <div class="location__venue">
-      <h3 class="location__venue-name">{{ wedding.venue }}</h3>
+      <h3 class="location__venue-name">
+        <LocalizedName block :korean="wedding.venue" :english="wedding.venueEnglish" />
+      </h3>
       <p class="location__hall">{{ wedding.hall }}</p>
       <p class="location__address">
-        {{ addressMain }}<span v-if="wedding.addressCopy" class="location__address-note"> ({{ wedding.addressCopy }})</span>
+        <LocalizedName block :korean="addressDisplayKo" :english="addressDisplayEn" />
       </p>
       <button type="button" class="btn-text location__copy-link" @click="copyAddress">
         {{ copied ? t.location.copied : t.location.copyAddress }}
@@ -107,6 +109,7 @@ import { buildMapLinks } from '../utils/mapLinks'
 import VenueMap from './VenueMap.vue'
 import SectionCornerPatterns from './SectionCornerPatterns.vue'
 import SectionHeader from './SectionHeader.vue'
+import LocalizedName from './LocalizedName.vue'
 
 const { wedding, t, isEnglish } = useInvitationContent()
 const activeTab = ref('subway')
@@ -118,6 +121,19 @@ const addressMain = computed(() => {
   const addr = wedding.value.address ?? ''
   const idx = addr.indexOf(' (')
   return idx >= 0 ? addr.slice(0, idx) : addr
+})
+
+const addressDisplayKo = computed(() => {
+  const main = addressMain.value
+  const copy = wedding.value.addressCopy
+  return copy ? `${main} (${copy})` : main
+})
+
+const addressDisplayEn = computed(() => {
+  const main = wedding.value.addressEnglish
+  const copy = wedding.value.addressCopyEnglish
+  if (!main) return ''
+  return copy ? `${main} (${copy})` : main
 })
 
 const mapLinks = computed(() =>
@@ -275,6 +291,19 @@ async function copyAddress() {
   font-weight: 600;
   color: var(--color-event-datetime);
   letter-spacing: 0.01em;
+}
+
+.location__venue-name :deep(.localized-name__ko) {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+
+.location__venue-name :deep(.localized-name__en) {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  letter-spacing: 0;
 }
 
 .location__hall,

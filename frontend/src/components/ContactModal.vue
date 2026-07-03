@@ -9,7 +9,12 @@
         <ul class="contact-modal__list">
           <li v-for="(contact, index) in contacts" :key="contact.phone" class="contact-modal__item">
             <span class="contact-modal__role">{{ contact.role }}</span>
-            <span class="contact-modal__name">{{ contact.name }}</span>
+            <LocalizedName
+              class="contact-modal__name"
+              block
+              :korean="contact.name"
+              :english="contact.englishName"
+            />
             <div class="contact-modal__phone-group">
               <span class="contact-modal__phone">{{ contact.phone }}</span>
               <a :href="telHref(contact.phone)" class="contact-modal__action contact-modal__action--call">
@@ -33,6 +38,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useInvitationContent } from '../composables/useInvitationContent'
+import LocalizedName from './LocalizedName.vue'
 
 defineProps({
   open: { type: Boolean, default: false },

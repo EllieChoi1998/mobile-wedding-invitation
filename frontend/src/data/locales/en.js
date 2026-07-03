@@ -78,6 +78,20 @@ export default {
     brideFather: "Bride's Father",
     brideMother: "Bride's Mother",
   },
+  names: {
+    groom: 'Moon Kyung Cho',
+    bride: 'Ellie Hye Ryung Choi',
+    groomFather: 'Seok Young Cho',
+    groomMother: 'Kyunghwa Kim',
+    brideFather: 'Tae Kyung Choi',
+    brideMother: 'Mi Sun Kang',
+  },
+  venue: {
+    hall: '5th Floor, Wedding Hall',
+    venueEn: 'Noble Valentino Samsung',
+    addressEn: '637 Bongeunsa-ro, Gangnam-gu, Seoul',
+    addressCopyEn: '109-6 Samseong-dong, Gangnam-gu, Seoul',
+  },
   couple: {
     groom: {
       birthDate: 'March 20, 1992',
@@ -203,13 +217,13 @@ export default {
     bride: {
       waitingRoom: {
         title: "Bride's Waiting Room",
-        body: 'From the 5층 웨딩홀 entrance, walk to the end of the corridor on the left. Please capture precious memories in photos with the bride.',
+        body: 'From the 5th Floor Wedding Hall entrance, walk to the end of the corridor on the left. Please capture precious memories in photos with the bride.',
       },
       banquet: {
         title: 'Banquet Halls',
         floors: [
-          { floor: '2층 (서브 연회장)', note: 'Dining available 30 minutes after the ceremony begins' },
-          { floor: '3층 (메인 연회장)', note: 'Dining available after the ceremony ends' },
+          { floor: '2nd Floor (Sub Banquet Hall)', note: 'Dining available 30 minutes after the ceremony begins' },
+          { floor: '3rd Floor (Main Banquet Hall)', note: 'Dining available after the ceremony ends' },
         ],
         footer:
           'Banquet halls operate on different schedules for your convenience. Thank you for your understanding.',

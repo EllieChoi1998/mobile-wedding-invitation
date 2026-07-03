@@ -1,17 +1,31 @@
 <template>
   <div class="parents-line">
     <div class="parents-line__row hanji-card parents-line__row--groom">
-      <span class="parents-line__name">{{ couple.groom.fullName }}</span>
+      <LocalizedName
+        class="parents-line__name"
+        block
+        :korean="couple.groom.fullName"
+        :english="couple.groom.englishName"
+      />
       <span class="parents-line__parents">
-        {{ parentsLine.groom.father }} · {{ parentsLine.groom.mother }}{{ t.parentsLine.groomPrefix }}
+        <LocalizedName :korean="parentsLine.groom.father" :english="parentsLine.groom.fatherEnglish" />
+        ·
+        <LocalizedName :korean="parentsLine.groom.mother" :english="parentsLine.groom.motherEnglish" />{{ t.parentsLine.groomPrefix }}
         {{ t.parentsLine.son }}
       </span>
     </div>
     <span class="parents-line__amp">&</span>
     <div class="parents-line__row hanji-card parents-line__row--bride">
-      <span class="parents-line__name">{{ couple.bride.fullName }}</span>
+      <LocalizedName
+        class="parents-line__name"
+        block
+        :korean="couple.bride.fullName"
+        :english="couple.bride.englishName"
+      />
       <span class="parents-line__parents">
-        {{ parentsLine.bride.father }} · {{ parentsLine.bride.mother }}{{ t.parentsLine.bridePrefix }}
+        <LocalizedName :korean="parentsLine.bride.father" :english="parentsLine.bride.fatherEnglish" />
+        ·
+        <LocalizedName :korean="parentsLine.bride.mother" :english="parentsLine.bride.motherEnglish" />{{ t.parentsLine.bridePrefix }}
         {{ t.parentsLine.daughter }}
       </span>
     </div>
@@ -23,6 +37,7 @@
 
 <script setup>
 import { useInvitationContent } from '../composables/useInvitationContent'
+import LocalizedName from './LocalizedName.vue'
 
 const emit = defineEmits(['contact'])
 
@@ -63,6 +78,18 @@ const { couple, parentsLine, t } = useInvitationContent()
   font-size: 1.0625rem;
   font-weight: 600;
   color: #333;
+}
+
+.parents-line__name :deep(.localized-name__ko) {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+
+.parents-line__name :deep(.localized-name__en) {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
 }
 
 .parents-line__parents {

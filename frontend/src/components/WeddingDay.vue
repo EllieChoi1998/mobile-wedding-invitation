@@ -10,7 +10,10 @@
       </div>
       <div class="wedding-day__info-row">
         <dt>{{ t.weddingDay.venue }}</dt>
-        <dd>{{ wedding.venue }}<br />{{ wedding.hall }}</dd>
+        <dd>
+          <LocalizedName block :korean="wedding.venue" :english="wedding.venueEnglish" />
+          <span class="wedding-day__hall">{{ wedding.hall }}</span>
+        </dd>
       </div>
     </dl>
 
@@ -72,6 +75,7 @@
 import { computed } from 'vue'
 import { useInvitationContent } from '../composables/useInvitationContent'
 import FloatingPetals from './FloatingPetals.vue'
+import LocalizedName from './LocalizedName.vue'
 import SectionHeader from './SectionHeader.vue'
 
 const { wedding, calendarLabel, weekdays, t } = useInvitationContent()
@@ -212,5 +216,10 @@ const calendarCells = computed(() => {
   font-weight: 500;
   line-height: 1.7;
   color: var(--color-event-venue);
+}
+
+.wedding-day__hall {
+  display: block;
+  margin-top: 0.25rem;
 }
 </style>
