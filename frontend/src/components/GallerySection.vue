@@ -124,7 +124,18 @@ function scrollThumbIntoView(index) {
     const strip = stripRef.value
     if (!strip) return
     const thumb = strip.children[index]
-    thumb?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+    if (!(thumb instanceof HTMLElement)) return
+
+    const thumbLeft = thumb.offsetLeft
+    const thumbWidth = thumb.offsetWidth
+    const stripWidth = strip.clientWidth
+    const maxScroll = strip.scrollWidth - stripWidth
+    const targetScroll = thumbLeft - (stripWidth - thumbWidth) / 2
+
+    strip.scrollTo({
+      left: Math.min(maxScroll, Math.max(0, targetScroll)),
+      behavior: 'smooth',
+    })
   })
 }
 
@@ -216,6 +227,10 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.gallery {
+  overflow-x: clip;
+}
+
 .gallery :deep(.section__head) {
   position: relative;
   z-index: 1;
@@ -273,6 +288,8 @@ onUnmounted(() => {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
+  max-width: 100%;
   padding: 0.25rem 0.125rem 0.5rem;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
