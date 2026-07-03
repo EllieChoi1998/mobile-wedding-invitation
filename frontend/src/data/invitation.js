@@ -162,7 +162,7 @@ export const wedding = {
   calendar: { year: 2026, month: 8, day: 15 },
   greeting:
     '저희 두 사람의 작은 만남이\n진실한 사랑으로 꽃피어\n오늘 이 자리를 빛내는 결혼식으로 이어졌습니다.\n\n평생 서로를 귀히 여기며\n처음의 설렘과 순수함을 잃지 않고\n존중하고 아껴 나가겠습니다.\n\n믿음과 사랑을 기초로 한 이 날에\n여러분의 따뜻한 축복이 함께 한다면\n더할 나위 없는 기쁨으로 간직하겠습니다.',
-  mapImagePath: 'location/map-placeholder.jpg',
+  mapImagePath: 'patterns/지도.svg',
   transport: {
     car: {
       label: '자가용',

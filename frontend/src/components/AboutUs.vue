@@ -58,8 +58,8 @@ import SectionHeader from './SectionHeader.vue'
 
 const { couple, parentsLine, t } = useInvitationContent()
 
-const groomPhoto = computed(() => resolveAssetImage(couple.groom.photoPath))
-const bridePhoto = computed(() => resolveAssetImage(couple.bride.photoPath))
+const groomPhoto = computed(() => resolveAssetImage(couple.value.groom.photoPath))
+const bridePhoto = computed(() => resolveAssetImage(couple.value.bride.photoPath))
 </script>
 
 <style scoped>

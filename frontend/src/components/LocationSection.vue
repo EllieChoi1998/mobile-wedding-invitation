@@ -19,6 +19,15 @@
         {{ t.location.naverMap }}
       </a>
       <a
+        v-if="isEnglish"
+        :href="mapLinks.googleMaps"
+        class="btn-outline"
+        @click="openGoogleMaps"
+      >
+        {{ t.location.googleMap }}
+      </a>
+      <a
+        v-else
         :href="mapLinks.tmap"
         class="btn-outline"
         @click="openTmap"
@@ -99,7 +108,7 @@ import VenueMap from './VenueMap.vue'
 import SectionCornerPatterns from './SectionCornerPatterns.vue'
 import SectionHeader from './SectionHeader.vue'
 
-const { wedding, t } = useInvitationContent()
+const { wedding, t, isEnglish } = useInvitationContent()
 const activeTab = ref('subway')
 const copied = ref(false)
 
@@ -127,6 +136,17 @@ function openTmap(event) {
   window.setTimeout(() => {
     if (document.visibilityState === 'visible') {
       window.open(kakaoRoute, '_blank', 'noopener,noreferrer')
+    }
+  }, 1500)
+}
+
+function openGoogleMaps(event) {
+  event.preventDefault()
+  const { googleMapsApp, googleMaps } = mapLinks.value
+  window.location.href = googleMapsApp
+  window.setTimeout(() => {
+    if (document.visibilityState === 'visible') {
+      window.open(googleMaps, '_blank', 'noopener,noreferrer')
     }
   }, 1500)
 }
@@ -203,7 +223,7 @@ function parseRouteSegments(line) {
 }
 
 function parseBusLine(line) {
-  const match = line.match(/^(간 선|지 선|직 행)\s+(.+)$/)
+  const match = line.match(/^(간 선|지 선|직 행|Main|Branch|Express)\s+(.+)$/)
   if (!match) return null
   return {
     label: match[1],
@@ -302,12 +322,11 @@ async function copyAddress() {
 .location__map {
   position: relative;
   width: 100%;
-  height: 0;
-  padding-bottom: 62.5%;
+  aspect-ratio: 1403 / 752;
   margin-bottom: 1rem;
   border-radius: 12px;
   overflow: hidden;
-  background: #e8e8e8;
+  background: #fff;
 }
 
 .location__map :deep(.venue-map) {

@@ -9,6 +9,7 @@ const assetModules = import.meta.glob(
     '../assets/about/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}',
     '../assets/sections/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}',
     '../assets/location/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}',
+    '../assets/patterns/*.{svg,SVG}',
   ],
   {
     eager: true,

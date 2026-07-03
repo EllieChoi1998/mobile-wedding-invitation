@@ -71,7 +71,7 @@ import SectionCornerPatterns from './SectionCornerPatterns.vue'
 // import ImageWithPlaceholder from './ImageWithPlaceholder.vue'
 
 const { couple, share, creator, illustrator, t } = useInvitationContent()
-const { locale } = useLocale()
+const { locale, isEnglish } = useLocale()
 
 const kakaoReady = ref(false)
 const copied = ref(false)
@@ -110,8 +110,8 @@ function shareKakao() {
   window.Kakao.Share.sendDefault({
     objectType: 'feed',
     content: {
-      title: `${couple.groom.fullName} ♥ ${couple.bride.fullName}`,
-      description: share.defaultMessage,
+      title: `${couple.value.groom.fullName} ♥ ${couple.value.bride.fullName}`,
+      description: share.value.defaultMessage,
       link: {
         mobileWebUrl: window.location.href,
         webUrl: window.location.href,
@@ -119,7 +119,7 @@ function shareKakao() {
     },
     buttons: [
       {
-        title: '청첩장 보기',
+        title: isEnglish.value ? share.value.kakaoButton : '청첩장 보기',
         link: {
           mobileWebUrl: window.location.href,
           webUrl: window.location.href,

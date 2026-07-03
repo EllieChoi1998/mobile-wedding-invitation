@@ -37,7 +37,7 @@
           :class="{ 'gallery__thumb--active': index === selectedIndex }"
           :aria-label="`${index + 1} / ${photos.length}`"
           :aria-current="index === selectedIndex ? 'true' : undefined"
-          @click="openLightbox(index)"
+          @click="selectPhoto(index)"
         >
           <img :src="photo.thumbUrl" :alt="photo.name" class="gallery__thumb-image" loading="lazy" />
         </button>

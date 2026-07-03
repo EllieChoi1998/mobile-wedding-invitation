@@ -7,12 +7,15 @@ export function buildMapLinks({ venue, address, lat, lng }) {
   const name = venue || address
   const searchQuery = encodeURIComponent(name)
   const encodedName = encodeURIComponent(name)
+  const coordsQuery = encodeURIComponent(`${lat},${lng}`)
 
   return {
     naver: `https://map.naver.com/v5/search/${searchQuery}`,
     kakao: `https://map.kakao.com/link/map/${encodedName},${lat},${lng}`,
     kakaoRoute: `https://map.kakao.com/link/to/${encodedName},${lat},${lng}`,
     tmap: `tmap://route?goalname=${encodedName}&goalx=${lng}&goaly=${lat}`,
+    googleMaps: `https://www.google.com/maps/search/?api=1&query=${coordsQuery}`,
+    googleMapsApp: `comgooglemaps://?q=${coordsQuery}(${encodedName})`,
   }
 }
 

@@ -3,11 +3,43 @@ export default {
     date: 'August 15, 2026',
     dayNote: 'Saturday',
     time: '11:00 AM',
-    venue: 'Noble Valentino Samsung',
     greeting:
-      'Our small meeting has blossomed\ninto true love,\nand today we celebrate our wedding.\n\nWe will cherish each other for life,\nkeeping the first excitement and purity,\nrespecting and caring for one another.\n\nWith faith and love as our foundation,\nwe would be deeply grateful\nfor your warm blessings on this day.',
+      'A simple connection that began with tutoring\nhas become part of each other\'s everyday life over four years,\nand now we are building a home to share for a lifetime.\n\nOn August 15th, when our nation welcomed a new light,\nwe too take our first steps toward a bright new chapter.\n\nWe would be honored to share this joy\nwith the cherished people in our lives.',
     calendarYearSuffix: '',
     calendarMonthSuffix: '',
+    transport: {
+      car: {
+        label: 'By Car',
+        lines: [
+          '<bold>경부고속도로</bold>',
+          'From Banpo IC, go straight toward Jamsil Sports Complex > Kyobo Life > Cha Hospital > Bongeunsa > straight to ASEM Tower > <bold>노블발렌티 삼성점</bold>',
+          '<bold>From western & northern Seoul</bold>',
+          'At Yeongdong Bridge south end, head toward Trade Center > Acro Samsung Apt. > left at Bongeunsa intersection in front of ASEM Tower > <bold>노블발렌티 삼성점</bold>',
+          '<bold>From southeastern Seoul</bold>',
+          'From Samseong Station (Line 2) toward Yeongdong Bridge at Trade Center intersection > right at Bongeunsa intersection in front of ASEM Tower > <bold>노블발렌티 삼성점</bold>',
+        ],
+      },
+      subway: {
+        label: 'Subway',
+        lines: [
+          '<bold>Line 9 Bongeunsa Station, Exit 4 — approx. 4 min on foot</bold>',
+          '<bold>Line 2 Samseong Station, Exit 7 — approx. 15 min on foot</bold> Bus — transfer to Gangnam 01 or 3417, get off at <bold>노블발렌티 stop</bold>',
+        ],
+      },
+      shuttle: {
+        label: 'Shuttle Bus',
+        lines: ['<bold>Bongeunsa Station Exit 5, 50–60m to the right (every 5 min)</bold>'],
+      },
+      bus: {
+        label: 'Bus',
+        lines: [
+          '<bold>Line 9 Bongeunsa Station Exit 3, near Samseong Police Substation</bold>',
+          'Main 143, 146, 301, 343, 345, 401',
+          'Branch 2413, 2415, 3217, 3414, 4318',
+          'Express 9407, 9507, 9607',
+        ],
+      },
+    },
   },
   weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
   side: {
@@ -22,7 +54,7 @@ export default {
   },
   cover: {
     eyebrow: 'Invitation',
-    title: 'We invite you to celebrate with us',
+    title: 'We warmly invite you',
     contact: 'Contact',
   },
   parentsLine: {
@@ -46,6 +78,16 @@ export default {
     brideFather: "Bride's Father",
     brideMother: "Bride's Mother",
   },
+  couple: {
+    groom: {
+      birthDate: 'March 20, 1992',
+      tags: ['#Camping', '#Running'],
+    },
+    bride: {
+      birthDate: 'October 8, 1998',
+      tags: ['#Snowboarding', '#Camping'],
+    },
+  },
   about: {
     eyebrow: 'About Us',
     title: 'Meet the Couple',
@@ -61,6 +103,33 @@ export default {
     counterDayUnit: 'd',
     showMore: 'Show more',
     showLess: 'Show less',
+    items: [
+      {
+        date: 'Early 2016',
+        title: 'A college tutor and a high school senior',
+        description: 'The day we started raising\na little tiger while teaching math and science',
+        emoji: '🎬',
+      },
+      {
+        date: 'June 24–25, 2022',
+        title: 'The time we walked together',
+        description: 'Hearts that slowly grew alike\nas we came to know each other',
+        emoji: '🫶',
+        showRelationshipCounter: true,
+      },
+      {
+        date: 'The Proposal',
+        title: 'In our first home together',
+        description: 'A familiar space became special\nand our promise began',
+        emoji: '🏡',
+      },
+      {
+        date: 'August 15, 2026',
+        title: 'Our Wedding',
+        description: 'Holding hands tightly,\na new story begins',
+        emoji: '🤵🏻🤍👰🏻‍♀️',
+      },
+    ],
   },
   interview: {
     eyebrow: 'Interview',
@@ -69,6 +138,23 @@ export default {
     brideLabel: 'Bride',
     showMore: 'Show more',
     showLess: 'Show less',
+    items: [
+      {
+        question: 'What was your first impression?',
+        groomAnswer: 'She was bright and full of energy.\nEven at our first meeting, she felt like someone I had known for a long time.',
+        brideAnswer: 'He seemed quiet but thoughtful.\nHis smile stood out :)',
+      },
+      {
+        question: 'What made you decide to get married?',
+        groomAnswer: 'Every small moment together felt joyful and comfortable.\nI thought, "This is the one."',
+        brideAnswer: 'The way he always puts me first.\nThat warmth became my certainty.',
+      },
+      {
+        question: 'Where are you going for your honeymoon?',
+        groomAnswer: '13 nights and 14 days in the U.S. and Cancun ✈️🌴',
+        brideAnswer: '13 nights and 14 days in the U.S. and Cancun ✈️🌴',
+      },
+    ],
   },
   weddingDay: {
     eyebrow: 'Wedding Day',
@@ -89,6 +175,7 @@ export default {
     copied: 'Copied!',
     naverMap: 'Naver Map',
     tmap: 'T Map',
+    googleMap: 'Google Maps',
     kakaoMap: 'Kakao Map',
     mapTapHint: 'Open in Naver Map',
     mapPlaceholder: 'assets/location/map-placeholder.jpg — map screenshot',
@@ -116,13 +203,13 @@ export default {
     bride: {
       waitingRoom: {
         title: "Bride's Waiting Room",
-        body: 'From the 5th-floor wedding hall entrance, walk to the end of the corridor on the left. Please capture precious memories in photos with the bride.',
+        body: 'From the 5층 웨딩홀 entrance, walk to the end of the corridor on the left. Please capture precious memories in photos with the bride.',
       },
       banquet: {
         title: 'Banquet Halls',
         floors: [
-          { floor: '2F (Sub Banquet Hall)', note: 'Dining available 30 minutes after the ceremony begins' },
-          { floor: '3F (Main Banquet Hall)', note: 'Dining available after the ceremony ends' },
+          { floor: '2층 (서브 연회장)', note: 'Dining available 30 minutes after the ceremony begins' },
+          { floor: '3층 (메인 연회장)', note: 'Dining available after the ceremony ends' },
         ],
         footer:
           'Banquet halls operate on different schedules for your convenience. Thank you for your understanding.',
@@ -154,11 +241,20 @@ export default {
   account: {
     eyebrow: 'Account',
     title: 'Gift Accounts',
-    desc: 'For those unable to attend,\nwe share our account details.\nThank you for your understanding.',
+    desc:
+      'For those unable to attend,\nwe share our account details below.\nWe will cherish the beautiful hearts of everyone who celebrates with us.',
     groomTab: "Groom's Side",
     brideTab: "Bride's Side",
     copy: 'Copy',
     copied: 'Copied!',
+    roleLabels: {
+      groom: 'Groom',
+      groomFather: "Groom's Father",
+      groomMother: "Groom's Mother",
+      bride: 'Bride',
+      brideFather: "Bride's Father",
+      brideMother: "Bride's Mother",
+    },
   },
   parents: {
     sectionTitle: 'Gift Accounts',
@@ -181,7 +277,7 @@ export default {
   rsvp: {
     eyebrow: 'Rsvp',
     title: 'RSVP',
-    desc: 'Please let us know if you can join us.',
+    desc: 'Thank you for honoring us with your presence.\nWe will prepare everything with care.',
     name: 'Your name',
     namePlaceholder: 'Enter your name',
     sideLegend: 'Which side are you attending with?',
@@ -212,6 +308,10 @@ export default {
     uploadClosed: 'Upload opens after the wedding.',
     statusLoading: 'Checking upload availability…',
     uploadError: 'Upload failed.',
+  },
+  share: {
+    defaultMessage: 'We invite you to our wedding',
+    kakaoButton: 'View Invitation',
   },
   ending: {
     title: 'Thank you for being part\nof our new beginning.',

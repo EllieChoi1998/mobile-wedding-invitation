@@ -54,7 +54,7 @@ const initialCount = 1
 const expanded = ref(false)
 
 const visibleItems = computed(() =>
-  expanded.value ? timeline : timeline.slice(0, initialCount),
+  expanded.value ? timeline.value : timeline.value.slice(0, initialCount),
 )
 
 const elapsedTime = computed(() => {

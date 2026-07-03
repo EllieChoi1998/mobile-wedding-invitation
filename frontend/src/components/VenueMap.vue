@@ -59,7 +59,7 @@ const staticMapUrl = computed(() =>
 .venue-map {
   width: 100%;
   height: 100%;
-  background: #e8e8e8;
+  background: #fff;
 }
 
 .venue-map__img {
@@ -67,7 +67,9 @@ const staticMapUrl = computed(() =>
   width: 100%;
   height: 100%;
   border: 0;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  background: #fff;
 }
 
 .venue-map__fallback {

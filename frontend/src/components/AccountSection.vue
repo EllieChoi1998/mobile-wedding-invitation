@@ -83,9 +83,10 @@ watch(
   { immediate: true },
 )
 
-const activeAccounts = computed(() =>
-  activeTab.value === 'groom' ? accounts.groomSide : accounts.brideSide,
-)
+const activeAccounts = computed(() => {
+  const list = accounts.value
+  return activeTab.value === 'groom' ? list.groomSide : list.brideSide
+})
 
 function setMotherRef(kind, index, el) {
   if (index !== MOTHER_INDEX) return
