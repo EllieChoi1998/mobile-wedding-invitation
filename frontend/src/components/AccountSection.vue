@@ -37,7 +37,6 @@
           <span class="account__label">{{ item.label }}</span>
           <LocalizedName
             class="account__name"
-            block
             :korean="item.name"
             :english="item.englishName"
           />

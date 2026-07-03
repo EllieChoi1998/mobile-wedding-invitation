@@ -66,6 +66,7 @@ export default {
   contactModal: {
     title: 'Contact',
     close: 'Close',
+    back: 'Back',
     call: 'Call',
     copy: 'Copy',
     copied: 'Copied',

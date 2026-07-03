@@ -1,7 +1,10 @@
 <template>
   <span class="localized-name" :class="{ 'localized-name--block': block }">
     <span class="localized-name__ko">{{ korean }}</span>
-    <span v-if="english" class="localized-name__en">{{ english }}</span>
+    <template v-if="english">
+      <span class="localized-name__sep" aria-hidden="true">·</span>
+      <span class="localized-name__en">{{ english }}</span>
+    </template>
   </span>
 </template>
 
@@ -22,20 +25,22 @@ defineProps({
   display: block;
 }
 
-.localized-name__ko {
+.localized-name__ko,
+.localized-name__en,
+.localized-name__sep {
   display: inline;
 }
 
-.localized-name__en {
-  display: block;
-  margin-top: 0.125rem;
-  font-size: 0.8125em;
+.localized-name__sep {
+  margin: 0 0.3em;
   font-weight: 400;
-  line-height: 1.45;
   color: var(--color-text-muted);
 }
 
-.localized-name--block .localized-name__ko {
-  display: block;
+.localized-name__en {
+  font-size: 0.8125em;
+  font-weight: 400;
+  line-height: inherit;
+  color: var(--color-text-muted);
 }
 </style>

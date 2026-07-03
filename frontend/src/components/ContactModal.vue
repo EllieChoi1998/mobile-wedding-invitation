@@ -6,15 +6,61 @@
           ✕
         </button>
         <h3 class="contact-modal__title">{{ t.contactModal.title }}</h3>
-        <ul class="contact-modal__list">
+
+        <template v-if="isEnglish">
+          <button
+            v-if="selectedContact"
+            type="button"
+            class="contact-modal__back"
+            @click="goBack"
+          >
+            ‹ {{ t.contactModal.back }}
+          </button>
+
+          <ul v-if="!selectedContact" class="contact-modal__name-list">
+            <li v-for="contact in contacts" :key="contact.roleKey">
+              <button
+                type="button"
+                class="contact-modal__name-btn"
+                @click="selectContact(contact.roleKey)"
+              >
+                <LocalizedName
+                  :korean="contact.name"
+                  :english="contact.englishName"
+                />
+              </button>
+            </li>
+          </ul>
+
+          <div v-else class="contact-modal__detail">
+            <LocalizedName
+              class="contact-modal__detail-name"
+              :korean="selectedContact.name"
+              :english="selectedContact.englishName"
+            />
+            <div class="contact-modal__phone-group contact-modal__phone-group--detail">
+              <span class="contact-modal__phone">{{ selectedContact.phone }}</span>
+              <a
+                :href="telHref(selectedContact.phone)"
+                class="contact-modal__action contact-modal__action--call"
+              >
+                {{ t.contactModal.call }}
+              </a>
+              <button
+                type="button"
+                class="contact-modal__action contact-modal__action--copy"
+                @click="copyPhone(selectedContact.phone)"
+              >
+                {{ copied ? t.contactModal.copied : t.contactModal.copy }}
+              </button>
+            </div>
+          </div>
+        </template>
+
+        <ul v-else class="contact-modal__list">
           <li v-for="(contact, index) in contacts" :key="contact.phone" class="contact-modal__item">
             <span class="contact-modal__role">{{ contact.role }}</span>
-            <LocalizedName
-              class="contact-modal__name"
-              block
-              :korean="contact.name"
-              :english="contact.englishName"
-            />
+            <span class="contact-modal__name">{{ contact.name }}</span>
             <div class="contact-modal__phone-group">
               <span class="contact-modal__phone">{{ contact.phone }}</span>
               <a :href="telHref(contact.phone)" class="contact-modal__action contact-modal__action--call">
@@ -36,29 +82,65 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useInvitationContent } from '../composables/useInvitationContent'
 import LocalizedName from './LocalizedName.vue'
 
-defineProps({
+const props = defineProps({
   open: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['close'])
 
-const { contacts, t } = useInvitationContent()
+const { contacts, t, isEnglish } = useInvitationContent()
 const copiedIndex = ref(-1)
+const copied = ref(false)
+const selectedRoleKey = ref(null)
+
+const selectedContact = computed(() =>
+  contacts.value.find((contact) => contact.roleKey === selectedRoleKey.value) ?? null,
+)
+
+watch(
+  () => props.open,
+  (isOpen) => {
+    if (!isOpen) {
+      selectedRoleKey.value = null
+      copied.value = false
+      copiedIndex.value = -1
+    }
+  },
+)
+
+function selectContact(roleKey) {
+  selectedRoleKey.value = roleKey
+  copied.value = false
+}
+
+function goBack() {
+  selectedRoleKey.value = null
+  copied.value = false
+}
 
 function telHref(phone) {
   return `tel:${phone.replace(/[^\d+]/g, '')}`
 }
 
-async function copyPhone(phone, index) {
-  const copied = await writeClipboard(phone)
-  if (!copied) return
-  copiedIndex.value = index
+async function copyPhone(phone, index = -1) {
+  const didCopy = await writeClipboard(phone)
+  if (!didCopy) return
+
+  if (index >= 0) {
+    copiedIndex.value = index
+    setTimeout(() => {
+      copiedIndex.value = -1
+    }, 2000)
+    return
+  }
+
+  copied.value = true
   setTimeout(() => {
-    copiedIndex.value = -1
+    copied.value = false
   }, 2000)
 }
 
@@ -130,6 +212,85 @@ async function writeClipboard(text) {
   font-weight: 600;
   text-align: center;
   color: #333;
+}
+
+.contact-modal__back {
+  display: block;
+  margin: -0.5rem 0 0.75rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-primary-dark);
+  cursor: pointer;
+}
+
+.contact-modal__name-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contact-modal__name-btn {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid rgba(var(--color-primary-rgb), 0.25);
+  border-radius: 10px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.contact-modal__name-btn:active {
+  background: var(--color-accent);
+  border-color: var(--color-primary);
+}
+
+.contact-modal__name-btn :deep(.localized-name) {
+  line-height: 1.45;
+}
+
+.contact-modal__name-btn :deep(.localized-name__ko) {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.contact-modal__name-btn :deep(.localized-name__en) {
+  font-size: 0.75rem;
+}
+
+.contact-modal__detail-name {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.contact-modal__detail-name :deep(.localized-name__ko) {
+  font-weight: 600;
+  color: #333;
+}
+
+.contact-modal__detail-name :deep(.localized-name__en) {
+  font-size: 0.875rem;
+}
+
+.contact-modal__detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0 0.25rem;
+  text-align: center;
+}
+
+.contact-modal__phone-group--detail {
+  width: 100%;
+  max-width: 100%;
 }
 
 .contact-modal__list {

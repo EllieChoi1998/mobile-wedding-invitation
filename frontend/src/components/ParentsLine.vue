@@ -92,6 +92,10 @@ const { couple, parentsLine, t } = useInvitationContent()
   font-size: 0.75rem;
 }
 
+.parents-line__name :deep(.localized-name) {
+  line-height: 1.45;
+}
+
 .parents-line__parents {
   font-size: 0.8125rem;
   color: var(--color-text-muted);
