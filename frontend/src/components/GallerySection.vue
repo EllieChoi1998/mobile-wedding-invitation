@@ -269,7 +269,8 @@ onUnmounted(() => {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
 }
 
 .gallery__cover-hint {
@@ -326,7 +327,8 @@ onUnmounted(() => {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
 }
 
 .lightbox {
@@ -348,13 +350,19 @@ onUnmounted(() => {
   justify-content: center;
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
 }
 
 .lightbox__image {
+  display: block;
+  width: auto;
+  height: auto;
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  object-position: center;
   border-radius: 4px;
   transform-origin: center center;
   user-select: none;
