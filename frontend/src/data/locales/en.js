@@ -70,6 +70,8 @@ export default {
     call: 'Call',
     copy: 'Copy',
     copied: 'Copied',
+    groomTab: "Groom's Side",
+    brideTab: "Bride's Side",
   },
   contactRoles: {
     groom: 'Groom',

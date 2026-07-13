@@ -34,9 +34,12 @@ export default {
   contactModal: {
     title: '연락하기',
     close: '닫기',
+    back: '뒤로',
     call: '통화',
     copy: '복사',
     copied: '복사됨',
+    groomTab: '신랑측',
+    brideTab: '신부측',
   },
   contactRoles: {
     groom: '신랑',
@@ -121,7 +124,7 @@ export default {
       banquet: {
         title: '연회장 안내',
         floors: [
-          { floor: '2층 (서브 연회장)', note: '예식 시작 30분 후부터 식사 가능' },
+          { floor: '2층 (서브 연회장)', note: '예식 시작 30분 전 부터 (오전 10시 30분 부터) 식사 가능' },
           { floor: '3층 (메인 연회장)', note: '본식 종료 후부터 식사 가능' },
         ],
         footer:
