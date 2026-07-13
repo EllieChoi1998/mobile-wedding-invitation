@@ -31,25 +31,29 @@
 
           <ul v-else class="guestbook-modal__list">
             <li v-for="entry in messages" :key="entry.messageId" class="guestbook-modal__entry">
-              <p class="guestbook-modal__from">{{ t.guestbook.from }}</p>
-              <p class="guestbook-modal__author">{{ entry.authorName }}</p>
-              <p class="guestbook-modal__text">
-                <template v-if="isExpanded(entry.messageId) || !isLongMessage(entry.message)">
-                  {{ entry.message }}
-                </template>
-                <template v-else>
-                  {{ previewMessage(entry.message) }}
-                </template>
+              <p class="guestbook-modal__meta">
+                <span class="guestbook-modal__from">{{ t.guestbook.from }}</span>
+                <span class="guestbook-modal__author">{{ entry.authorName }}</span>
               </p>
+              <p
+                :ref="(el) => setTextRef(entry.messageId, el)"
+                class="guestbook-modal__text"
+                :class="{ 'guestbook-modal__text--collapsed': !isExpanded(entry.messageId) }"
+              >
+                {{ entry.message }}
+              </p>
+              <time
+                v-if="isExpanded(entry.messageId) || !needsToggle(entry.messageId)"
+                class="guestbook-modal__date"
+              >{{ formatDate(entry.createdAt) }}</time>
               <button
-                v-if="isLongMessage(entry.message)"
+                v-if="needsToggle(entry.messageId)"
                 type="button"
                 class="btn-text guestbook-modal__toggle"
                 @click="toggleExpanded(entry.messageId)"
               >
                 {{ isExpanded(entry.messageId) ? t.guestbook.showLess : t.guestbook.showMore }}
               </button>
-              <time class="guestbook-modal__date">{{ formatDate(entry.createdAt) }}</time>
             </li>
           </ul>
         </div>
@@ -59,11 +63,9 @@
 </template>
 
 <script setup>
-import { ref, watch, onUnmounted } from 'vue'
+import { nextTick, onUnmounted, ref, watch } from 'vue'
 import { useLocale } from '../composables/useLocale'
 import SectionHeader from './SectionHeader.vue'
-
-const PREVIEW_MAX_CHARS = 80
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -76,6 +78,8 @@ const emit = defineEmits(['close'])
 
 const { t } = useLocale()
 const expandedIds = ref(new Set())
+const truncatableIds = ref(new Set())
+const textRefs = new Map()
 
 watch(
   () => props.open,
@@ -83,21 +87,70 @@ watch(
     document.body.style.overflow = isOpen ? 'hidden' : ''
     if (!isOpen) {
       expandedIds.value = new Set()
+      truncatableIds.value = new Set()
+      textRefs.clear()
+      return
     }
+    scheduleMeasure()
   },
   { immediate: true },
+)
+
+watch(
+  () => [props.messages, props.loading],
+  () => {
+    if (props.open && !props.loading) {
+      scheduleMeasure()
+    }
+  },
+  { deep: true },
 )
 
 onUnmounted(() => {
   document.body.style.overflow = ''
 })
 
-function isLongMessage(message) {
-  return message.length > PREVIEW_MAX_CHARS
+function setTextRef(messageId, el) {
+  if (el) {
+    textRefs.set(messageId, el)
+  } else {
+    textRefs.delete(messageId)
+  }
 }
 
-function previewMessage(message) {
-  return `${message.slice(0, PREVIEW_MAX_CHARS)}…`
+function scheduleMeasure() {
+  nextTick(() => {
+    requestAnimationFrame(measureTruncation)
+  })
+}
+
+function measureTruncation() {
+  const next = new Set()
+
+  for (const [messageId, el] of textRefs.entries()) {
+    if (!(el instanceof HTMLElement)) continue
+
+    const wasExpanded = expandedIds.value.has(messageId)
+    if (wasExpanded) {
+      el.classList.add('guestbook-modal__text--collapsed')
+    }
+
+    const overflows = el.scrollHeight > el.clientHeight + 1
+
+    if (wasExpanded) {
+      el.classList.remove('guestbook-modal__text--collapsed')
+    }
+
+    if (overflows || wasExpanded) {
+      next.add(messageId)
+    }
+  }
+
+  truncatableIds.value = next
+}
+
+function needsToggle(messageId) {
+  return truncatableIds.value.has(messageId) || expandedIds.value.has(messageId)
 }
 
 function isExpanded(messageId) {
@@ -112,6 +165,10 @@ function toggleExpanded(messageId) {
     next.add(messageId)
   }
   expandedIds.value = next
+
+  const truncatable = new Set(truncatableIds.value)
+  truncatable.add(messageId)
+  truncatableIds.value = truncatable
 }
 
 function formatDate(iso) {
@@ -138,13 +195,14 @@ function formatDate(iso) {
   flex-direction: column;
   width: 100%;
   max-width: 340px;
-  min-height: 28.5rem;
+  height: min(86vh, 36rem);
   max-height: 86vh;
   padding: 1.375rem 1rem 1.125rem;
   padding-top: 1.625rem;
   border-radius: 16px;
   background: var(--color-accent);
   box-shadow: 0 8px 28px rgba(var(--color-primary-rgb), 0.28);
+  overflow: hidden;
 }
 
 .guestbook-modal__close {
@@ -189,15 +247,17 @@ function formatDate(iso) {
 
 .guestbook-modal__body {
   flex: 1;
-  min-height: 22rem;
-  height: 22rem;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .guestbook-modal__placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  flex: 1;
   margin: 0;
   padding: 0 1rem;
   text-align: center;
@@ -214,34 +274,46 @@ function formatDate(iso) {
 .guestbook-modal__list {
   list-style: none;
   margin: 0;
-  height: 100%;
-  padding: 0.25rem 0.125rem 0.125rem;
+  flex: 1;
+  min-height: 0;
+  padding: 0.25rem 0.25rem 0.5rem 0.125rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .guestbook-modal__entry {
   flex-shrink: 0;
-  min-height: 4.75rem;
   padding: 1rem 1.0625rem;
   border-radius: 12px;
   background: #fff;
 }
 
+.guestbook-modal__meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 0 0 0.375rem;
+  min-width: 0;
+}
+
 .guestbook-modal__from {
-  margin: 0 0 0.125rem;
+  flex-shrink: 0;
   font-size: 0.6875rem;
   color: var(--color-text-muted);
 }
 
 .guestbook-modal__author {
-  margin: 0 0 0.375rem;
+  min-width: 0;
   font-weight: 600;
   font-size: 0.875rem;
   color: var(--color-text);
+  word-break: keep-all;
 }
 
 .guestbook-modal__text {
@@ -250,6 +322,17 @@ function formatDate(iso) {
   line-height: 1.7;
   color: var(--color-text-muted);
   white-space: pre-line;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.guestbook-modal__text--collapsed {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+  white-space: normal;
 }
 
 .guestbook-modal__toggle {
@@ -260,7 +343,7 @@ function formatDate(iso) {
 
 .guestbook-modal__date {
   display: block;
-  margin-top: 0.5rem;
+  margin-top: 0.375rem;
   font-size: 0.6875rem;
   color: var(--color-text-muted);
 }
