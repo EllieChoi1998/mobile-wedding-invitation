@@ -57,25 +57,59 @@
         삭제할 항목을 선택한 뒤, 하단에서 삭제 비밀번호를 입력하세요.
       </p>
 
+      <section class="admin__filters">
+        <p class="admin__filters-label">측 필터</p>
+        <div class="admin__filter-tabs" role="group" aria-label="신랑측 / 신부측 필터">
+          <button
+            type="button"
+            class="admin__filter-tab"
+            :class="{ 'admin__filter-tab--active': sideFilter === 'all' }"
+            @click="sideFilter = 'all'"
+          >
+            전체
+          </button>
+          <button
+            type="button"
+            class="admin__filter-tab"
+            :class="{ 'admin__filter-tab--active': sideFilter === 'groom' }"
+            @click="setSideFilter('groom')"
+          >
+            신랑측
+          </button>
+          <button
+            type="button"
+            class="admin__filter-tab"
+            :class="{ 'admin__filter-tab--active': sideFilter === 'bride' }"
+            @click="setSideFilter('bride')"
+          >
+            신부측
+          </button>
+        </div>
+      </section>
+
       <section class="admin__summary">
         <div class="admin__card">
           <h2 class="admin__card-title">RSVP</h2>
-          <p class="admin__stat">전체 <strong>{{ data.summary.rsvp.total }}</strong></p>
+          <p class="admin__stat">전체 <strong>{{ filteredRsvpSummary.total }}</strong></p>
           <p class="admin__stat admin__stat--yes">
-            참석 <strong>{{ data.summary.rsvp.attending }}</strong>
+            참석 <strong>{{ filteredRsvpSummary.attending }}</strong>
           </p>
           <p class="admin__stat admin__stat--no">
-            불참 <strong>{{ data.summary.rsvp.notAttending }}</strong>
+            불참 <strong>{{ filteredRsvpSummary.notAttending }}</strong>
           </p>
         </div>
         <div class="admin__card">
           <h2 class="admin__card-title">방명록</h2>
-          <p class="admin__stat">전체 <strong>{{ data.summary.guestbook.total }}</strong></p>
+          <p class="admin__stat">전체 <strong>{{ filteredGuestbookBySide.length }}</strong></p>
         </div>
         <div class="admin__card">
           <h2 class="admin__card-title">사진</h2>
-          <p class="admin__stat">신랑 <strong>{{ data.summary.photos.groom }}</strong></p>
-          <p class="admin__stat">신부 <strong>{{ data.summary.photos.bride }}</strong></p>
+          <p v-if="sideFilter === 'all' || sideFilter === 'groom'" class="admin__stat">
+            신랑 <strong>{{ data.summary.photos.groom }}</strong>
+          </p>
+          <p v-if="sideFilter === 'all' || sideFilter === 'bride'" class="admin__stat">
+            신부 <strong>{{ data.summary.photos.bride }}</strong>
+          </p>
         </div>
       </section>
 
@@ -139,17 +173,50 @@
 
       <section class="admin__section">
         <div class="admin__section-head">
-          <h2 class="admin__section-title">RSVP 목록</h2>
-          <div v-if="deleteMode && data.rsvps.length > 0" class="admin__section-actions">
-            <button type="button" class="admin__bulk-btn" @click="selectAllRsvps">
-              전체 선택
+          <h2 class="admin__section-title">
+            RSVP 목록
+            <span class="admin__count">({{ filteredRsvps.length }})</span>
+          </h2>
+          <div class="admin__section-actions">
+            <button
+              v-if="!deleteMode"
+              type="button"
+              class="admin__bulk-btn admin__bulk-btn--primary"
+              :disabled="filteredRsvps.length === 0"
+              @click="downloadRsvpExcel"
+            >
+              엑셀 다운로드
             </button>
-            <button type="button" class="admin__bulk-btn" @click="deselectAllRsvps">
-              선택 해제
-            </button>
+            <template v-if="deleteMode && filteredRsvps.length > 0">
+              <button type="button" class="admin__bulk-btn" @click="selectAllRsvps">
+                전체 선택
+              </button>
+              <button type="button" class="admin__bulk-btn" @click="deselectAllRsvps">
+                선택 해제
+              </button>
+            </template>
           </div>
         </div>
+        <div class="admin__toolbar">
+          <input
+            v-model="rsvpSearch"
+            type="search"
+            class="admin__search"
+            placeholder="참석자 이름 검색"
+            aria-label="참석자 이름 검색"
+          />
+          <label class="admin__dup-toggle">
+            <input v-model="rsvpDuplicatesOnly" type="checkbox" />
+            중복 이름만 보기
+            <span v-if="duplicateRsvpCount > 0" class="admin__dup-count">
+              ({{ duplicateRsvpCount }})
+            </span>
+          </label>
+        </div>
         <div v-if="data.rsvps.length === 0" class="admin__empty">등록된 RSVP가 없습니다</div>
+        <div v-else-if="filteredRsvps.length === 0" class="admin__empty">
+          조건에 맞는 RSVP가 없습니다
+        </div>
         <div v-else class="admin__table-wrap">
           <table class="admin__table">
             <thead>
@@ -170,9 +237,12 @@
             </thead>
             <tbody>
               <tr
-                v-for="rsvp in data.rsvps"
+                v-for="rsvp in filteredRsvps"
                 :key="rsvp.rsvpId"
-                :class="{ 'admin__row--selected': isSelected('rsvp', rsvp.rsvpId, rsvp.side) }"
+                :class="{
+                  'admin__row--selected': isSelected('rsvp', rsvp.rsvpId, rsvp.side),
+                  'admin__row--duplicate': duplicateRsvpIds.has(rsvp.rsvpId),
+                }"
                 @click="deleteMode && toggleSelect({ resource: 'rsvp', id: rsvp.rsvpId, side: rsvp.side })"
               >
                 <td v-if="deleteMode" class="admin__check-col" @click.stop>
@@ -182,7 +252,16 @@
                     @change="toggleSelect({ resource: 'rsvp', id: rsvp.rsvpId, side: rsvp.side })"
                   />
                 </td>
-                <td>{{ rsvp.guestName }}</td>
+                <td>
+                  {{ rsvp.guestName }}
+                  <span
+                    v-if="duplicateRsvpIds.has(rsvp.rsvpId)"
+                    class="admin__dup-badge"
+                    title="동일 측에서 중복된 이름이 포함된 항목"
+                  >
+                    중복
+                  </span>
+                </td>
                 <td>{{ sideLabel(rsvp.side) }}</td>
                 <td>
                   <span
@@ -201,8 +280,11 @@
 
       <section class="admin__section">
         <div class="admin__section-head">
-          <h2 class="admin__section-title">방명록</h2>
-          <div v-if="deleteMode && data.guestbook.length > 0" class="admin__section-actions">
+          <h2 class="admin__section-title">
+            방명록
+            <span class="admin__count">({{ filteredGuestbook.length }})</span>
+          </h2>
+          <div v-if="deleteMode && filteredGuestbook.length > 0" class="admin__section-actions">
             <button type="button" class="admin__bulk-btn" @click="selectAllGuestbook">
               전체 선택
             </button>
@@ -211,7 +293,19 @@
             </button>
           </div>
         </div>
+        <div class="admin__toolbar">
+          <input
+            v-model="guestbookSearch"
+            type="search"
+            class="admin__search"
+            placeholder="작성자 이름 검색"
+            aria-label="작성자 이름 검색"
+          />
+        </div>
         <div v-if="data.guestbook.length === 0" class="admin__empty">등록된 방명록이 없습니다</div>
+        <div v-else-if="filteredGuestbook.length === 0" class="admin__empty">
+          조건에 맞는 방명록이 없습니다
+        </div>
         <div v-else class="admin__table-wrap">
           <table class="admin__table">
             <thead>
@@ -232,7 +326,7 @@
             </thead>
             <tbody>
               <tr
-                v-for="msg in data.guestbook"
+                v-for="msg in filteredGuestbook"
                 :key="msg.messageId"
                 :class="{ 'admin__row--selected': isSelected('guestbook', msg.messageId) }"
                 @click="deleteMode && toggleSelect({ resource: 'guestbook', id: msg.messageId })"
@@ -295,6 +389,7 @@
         </div>
         <div class="admin__photo-tabs">
           <button
+            v-if="sideFilter === 'all' || sideFilter === 'groom'"
             type="button"
             class="admin__tab"
             :class="{ 'admin__tab--active': photoTab === 'groom' }"
@@ -303,6 +398,7 @@
             신랑 ({{ data.photos.groom.length }})
           </button>
           <button
+            v-if="sideFilter === 'all' || sideFilter === 'bride'"
             type="button"
             class="admin__tab"
             :class="{ 'admin__tab--active': photoTab === 'bride' }"
@@ -412,9 +508,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { deleteAdminItems, fetchAdminData, updateAppSettings } from '../api/admin'
 import { isApiConfigured } from '../api/client'
+import { downloadExcel } from '../utils/excelDownload'
+import { findDuplicateRsvpIds } from '../utils/rsvpNames'
 
 const apiConfigured = isApiConfigured()
 const STORAGE_KEY = 'adminPassword'
@@ -428,6 +526,11 @@ const loadError = ref('')
 const data = ref(null)
 const photoTab = ref('groom')
 
+const sideFilter = ref('all')
+const rsvpSearch = ref('')
+const guestbookSearch = ref('')
+const rsvpDuplicatesOnly = ref(false)
+
 const deleteMode = ref(false)
 const selectedKeys = ref(new Set())
 const photoDownloadKeys = ref(new Set())
@@ -439,6 +542,52 @@ const deleting = ref(false)
 const settingsUpdating = ref(false)
 const settingsError = ref('')
 
+const rsvpsBySide = computed(() => {
+  if (!data.value) return []
+  if (sideFilter.value === 'all') return data.value.rsvps
+  return data.value.rsvps.filter((rsvp) => rsvp.side === sideFilter.value)
+})
+
+const duplicateRsvpIds = computed(() => findDuplicateRsvpIds(rsvpsBySide.value))
+
+const duplicateRsvpCount = computed(() => duplicateRsvpIds.value.size)
+
+const filteredRsvps = computed(() => {
+  const query = rsvpSearch.value.trim().toLowerCase()
+  return rsvpsBySide.value.filter((rsvp) => {
+    if (rsvpDuplicatesOnly.value && !duplicateRsvpIds.value.has(rsvp.rsvpId)) {
+      return false
+    }
+    if (query && !rsvp.guestName?.toLowerCase().includes(query)) {
+      return false
+    }
+    return true
+  })
+})
+
+const filteredRsvpSummary = computed(() => {
+  const list = rsvpsBySide.value
+  return {
+    total: list.length,
+    attending: list.filter((r) => r.attending).length,
+    notAttending: list.filter((r) => !r.attending).length,
+  }
+})
+
+const filteredGuestbookBySide = computed(() => {
+  if (!data.value) return []
+  if (sideFilter.value === 'all') return data.value.guestbook
+  return data.value.guestbook.filter((msg) => msg.side === sideFilter.value)
+})
+
+const filteredGuestbook = computed(() => {
+  const query = guestbookSearch.value.trim().toLowerCase()
+  if (!query) return filteredGuestbookBySide.value
+  return filteredGuestbookBySide.value.filter((msg) =>
+    msg.authorName?.toLowerCase().includes(query),
+  )
+})
+
 const currentPhotos = computed(() => {
   if (!data.value) return []
   return data.value.photos[photoTab.value] ?? []
@@ -449,14 +598,24 @@ const selectedCount = computed(() => selectedKeys.value.size)
 const photoDownloadCount = computed(() => photoDownloadKeys.value.size)
 
 const allRsvpsSelected = computed(() => {
-  if (!data.value?.rsvps.length) return false
-  return data.value.rsvps.every((rsvp) => isSelected('rsvp', rsvp.rsvpId, rsvp.side))
+  if (!filteredRsvps.value.length) return false
+  return filteredRsvps.value.every((rsvp) => isSelected('rsvp', rsvp.rsvpId, rsvp.side))
 })
 
 const allGuestbookSelected = computed(() => {
-  if (!data.value?.guestbook.length) return false
-  return data.value.guestbook.every((msg) => isSelected('guestbook', msg.messageId))
+  if (!filteredGuestbook.value.length) return false
+  return filteredGuestbook.value.every((msg) => isSelected('guestbook', msg.messageId))
 })
+
+watch(sideFilter, (side) => {
+  if (side === 'groom' || side === 'bride') {
+    photoTab.value = side
+  }
+})
+
+function setSideFilter(side) {
+  sideFilter.value = side
+}
 
 function selectionKey({ resource, id, side }) {
   return `${resource}:${id}:${side ?? ''}`
@@ -490,8 +649,7 @@ function removeFromSelection(items) {
 }
 
 function rsvpSelectionItems() {
-  if (!data.value) return []
-  return data.value.rsvps.map((rsvp) => ({
+  return filteredRsvps.value.map((rsvp) => ({
     resource: 'rsvp',
     id: rsvp.rsvpId,
     side: rsvp.side,
@@ -499,8 +657,7 @@ function rsvpSelectionItems() {
 }
 
 function guestbookSelectionItems() {
-  if (!data.value) return []
-  return data.value.guestbook.map((msg) => ({
+  return filteredGuestbook.value.map((msg) => ({
     resource: 'guestbook',
     id: msg.messageId,
   }))
@@ -508,7 +665,11 @@ function guestbookSelectionItems() {
 
 function photoSelectionItems(side = null) {
   if (!data.value) return []
-  const sides = side ? [side] : ['groom', 'bride']
+  const sides = side
+    ? [side]
+    : sideFilter.value === 'all'
+      ? ['groom', 'bride']
+      : [sideFilter.value]
   return sides.flatMap((tab) =>
     (data.value.photos[tab] ?? []).map((photo) => ({
       resource: 'photo',
@@ -621,7 +782,9 @@ function clearDeleteSelection() {
 
 function getSelectedPhotosForDownload() {
   if (!data.value) return []
-  return ['groom', 'bride'].flatMap((side) =>
+  const sides =
+    sideFilter.value === 'all' ? ['groom', 'bride'] : [sideFilter.value]
+  return sides.flatMap((side) =>
     (data.value.photos[side] ?? [])
       .filter((photo) => isPhotoDownloadSelected(photo.photoId, side))
       .map((photo) => ({ ...photo, side })),
@@ -654,6 +817,21 @@ async function downloadSelectedPhotos() {
   } finally {
     photoDownloading.value = false
   }
+}
+
+function downloadRsvpExcel() {
+  const headers = ['이름', '측', '참석', '제출 시각']
+  const rows = filteredRsvps.value.map((rsvp) => [
+    rsvp.guestName,
+    sideLabel(rsvp.side),
+    rsvp.attending ? '참석' : '불참',
+    formatDate(rsvp.createdAt),
+  ])
+  const stamp = new Date().toISOString().slice(0, 10)
+  const sideSuffix =
+    sideFilter.value === 'all' ? '전체' : sideFilter.value === 'groom' ? '신랑측' : '신부측'
+  const dupSuffix = rsvpDuplicatesOnly.value ? '_중복' : ''
+  downloadExcel(headers, rows, `참석자명단_${sideSuffix}${dupSuffix}_${stamp}`, '참석자')
 }
 
 function parseSelectedItems() {
@@ -788,6 +966,10 @@ function logout() {
   passwordInput.value = ''
   loginError.value = ''
   loadError.value = ''
+  sideFilter.value = 'all'
+  rsvpSearch.value = ''
+  guestbookSearch.value = ''
+  rsvpDuplicatesOnly.value = false
 }
 
 onMounted(async () => {
@@ -954,6 +1136,108 @@ onMounted(async () => {
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1rem;
   margin-bottom: 2.5rem;
+}
+
+.admin__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.85rem 1rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 6%);
+}
+
+.admin__filters-label {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #888);
+}
+
+.admin__filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.admin__filter-tab {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #888);
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.admin__filter-tab--active {
+  color: #fff;
+  background: var(--color-primary-dark, #e8899e);
+  border-color: var(--color-primary-dark, #e8899e);
+}
+
+.admin__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.admin__search {
+  flex: 1 1 180px;
+  max-width: 280px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.admin__dup-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #888);
+  cursor: pointer;
+  user-select: none;
+}
+
+.admin__dup-count {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+.admin__count {
+  margin-left: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-muted, #888);
+}
+
+.admin__dup-badge {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #8a5a00;
+  background: #fff8e6;
+  border: 1px solid #f0d78c;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.admin__row--duplicate {
+  background: #fffdf5;
+}
+
+.admin__row--duplicate.admin__row--selected {
+  background: #fff5f7;
 }
 
 .admin__card {
